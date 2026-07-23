@@ -1,0 +1,5 @@
+job_id,title,department,seniority,key_domains,required_skills,nice_to_have
+JOB001,Senior ML Engineer,AI/ML,Senior,"Sports Video Analysis;Computer Vision;Deep Learning","Python;PyTorch;Computer Vision;Object Detection;AWS","Sports Analytics;Real-time processing;Docker"
+JOB002,Backend Engineer,Engineering,Mid-Senior,"Video Processing;Distributed Systems;APIs","Python;Go;Kafka;AWS;Microservices;REST APIs","FFmpeg;Video streaming;Redis"
+JOB003,Senior Product Manager - Sports Data,Product,Senior,"Sports Technology;B2B SaaS;Data Products","Product Management;Sports Analytics;API Products;Stakeholder Management","OTT platforms;Broadcast tech;SQL"
+JOB004,Data Engineer,Data,Mid,"Sports Data Pipeline;Cloud Infrastructure","Python;Spark;dbt;SQL;AWS;Airflow","Sports domain knowledge;Kafka;Terraform"

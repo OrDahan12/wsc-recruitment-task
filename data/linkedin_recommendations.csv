@@ -1,0 +1,22 @@
+﻿recommendation_id,candidate_name,candidate_linkedin_url,recommender_name,recommender_title,recommender_company,is_wsc_employee,wsc_bridge_employee_id,sentiment,text
+REC500,James Thornton,linkedin.com/in/james-thornton-ml,Nina Kovac,ML Lead,Opta,no,WSC002,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC501,Priya Anand,linkedin.com/in/priya-anand-cv,Elena Popova,Engineering Director,Nielsen Sports,no,WSC002,positive,Delivered complex video AI work reliably; I'd work with them again anytime.
+REC502,Emily Carter,linkedin.com/in/emily-carter-video,Elena Popova,Engineering Director,Nielsen Sports,no,WSC001,positive,Outstanding engineer - shipped our real-time tracking pipeline end to end.
+REC503,Amir Hassan,linkedin.com/in/amir-hassan-sports,Hannah Weiss,Director of Data,Genius Sports,no,WSC004,positive,Took ownership from day one and raised the bar for the whole team.
+REC504,Ryan Patel,linkedin.com/in/ryan-patel-dazn,Elena Popova,Engineering Director,Nielsen Sports,no,WSC008,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC505,Ethan Clark,linkedin.com/in/ethan-clark-aws,Daniel Rossi,Engineering Manager,Sportradar,no,WSC001,positive,"Exceptional problem-solver, calm under pressure, mentors others generously."
+REC506,Noah Anderson,linkedin.com/in/noah-anderson-gs,Elena Popova,Engineering Director,Nielsen Sports,no,WSC004,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC507,Owen Jackson,linkedin.com/in/owen-jackson-fox,Daniel Rossi,Engineering Manager,Sportradar,no,WSC006,positive,Took ownership from day one and raised the bar for the whole team.
+REC508,Liam Harris,linkedin.com/in/liam-harris-kinexon,Daniel Rossi,Engineering Manager,Sportradar,no,WSC014,positive,Rare mix of technical depth and product sense; highly recommended.
+REC509,Elijah Allen,linkedin.com/in/elijah-allen-deltatre,Daniel Rossi,Engineering Manager,Sportradar,no,WSC011,positive,Outstanding engineer - shipped our real-time tracking pipeline end to end.
+REC510,Scarlett Green,linkedin.com/in/scarlett-green-nfl,Hannah Weiss,Director of Data,Genius Sports,no,WSC013,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC511,Fatima Al-Rashid,linkedin.com/in/fatima-alrashid-data,Sara Lindqvist,VP Product,Stats Perform,no,WSC004,positive,Rare mix of technical depth and product sense; highly recommended.
+REC512,Sara Lindqvist,linkedin.com/in/sara-lindqvist-ml,Nina Kovac,ML Lead,Opta,no,WSC002,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC513,Bruno Ferreira,linkedin.com/in/bruno-ferreira-benfica,Kevin O'Brien,Principal Engineer,DAZN,no,WSC008,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC514,Adaora Okafor,linkedin.com/in/adaora-okafor-tech,Nina Kovac,ML Lead,Opta,no,WSC011,positive,Outstanding engineer - shipped our real-time tracking pipeline end to end.
+REC515,Tom Barker,linkedin.com/in/tom-barker-akamai,Hannah Weiss,Director of Data,Genius Sports,no,WSC009,positive,Rare mix of technical depth and product sense; highly recommended.
+REC516,Rafa Torres,linkedin.com/in/rafa-torres-sre,Kevin O'Brien,Principal Engineer,DAZN,no,WSC006,positive,"Exceptional problem-solver, calm under pressure, mentors others generously."
+REC517,Stefano Conti,linkedin.com/in/stefano-conti-sky,Marco Bianchi,Head of Video,Deltatre,no,WSC011,positive,Rare mix of technical depth and product sense; highly recommended.
+REC518,Lars Andersen,linkedin.com/in/lars-andersen-ericsson,Kevin O'Brien,Principal Engineer,DAZN,no,WSC009,positive,One of the strongest hires I've made; deep expertise and a great teammate.
+REC519,Yael Ben-David,linkedin.com/in/yael-bendavid-akamai,Hannah Weiss,Director of Data,Genius Sports,no,WSC009,positive,"Exceptional problem-solver, calm under pressure, mentors others generously."
+REC520,Marta Kowalska,linkedin.com/in/marta-kowalska-img,Sara Lindqvist,VP Product,Stats Perform,no,WSC006,positive,One of the strongest hires I've made; deep expertise and a great teammate.

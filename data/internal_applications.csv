@@ -1,0 +1,30 @@
+﻿application_id,job_id,hubspot_id,candidate_name,source,applied_date,ats_status
+APP1000,JOB003,HS002,Priya Anand,Internal ATS (Comeet),2024-12-04,New
+APP1001,JOB004,HS005,Tom Nguyen,Internal ATS (Comeet),2024-04-08,New
+APP1002,JOB002,HS007,Rachel Kim,Internal ATS (Comeet),2025-04-15,Rejected
+APP1003,JOB002,HS010,Ben Walker,Internal ATS (Comeet),2025-05-05,Rejected
+APP1004,JOB003,HS011,Yuki Tanaka,Internal ATS (Comeet),2025-02-12,New
+APP1005,JOB002,HS025,Lucas Evans,Internal ATS (Comeet),2024-04-28,Rejected
+APP1006,JOB003,HS026,Grace Wilson,Internal ATS (Comeet),2025-03-12,In Review
+APP1007,JOB002,HS031,Owen Jackson,Internal ATS (Comeet),2024-03-15,Phone Screen
+APP1008,JOB001,HS039,Henry Wright,Internal ATS (Comeet),2025-05-03,Rejected
+APP1009,JOB003,HS040,Scarlett Green,Internal ATS (Comeet),2025-07-21,New
+APP1010,JOB002,HS042,Fatima Al-Rashid,Internal ATS (Comeet),2025-12-19,Rejected
+APP1011,JOB004,HS047,Katarzyna Wojcik,Internal ATS (Comeet),2024-02-05,New
+APP1012,JOB004,HS051,Adaora Okafor,Internal ATS (Comeet),2025-09-09,Phone Screen
+APP1013,JOB001,HS054,Mei Zhang,Internal ATS (Comeet),2025-11-11,Rejected
+APP1014,JOB004,HS055,Rafa Torres,Internal ATS (Comeet),2024-12-24,New
+APP1015,JOB002,HS056,Kim Soo-Jin,Internal ATS (Comeet),2024-11-10,Phone Screen
+APP1016,JOB003,HS059,David Petersen,Internal ATS (Comeet),2024-10-11,Rejected
+APP1017,JOB003,HS061,Stefano Conti,Internal ATS (Comeet),2025-04-02,Rejected
+APP1018,JOB001,HS062,Jerome Blanc,Internal ATS (Comeet),2025-02-25,New
+APP1019,JOB004,HS064,Pilar Reyes,Internal ATS (Comeet),2024-05-17,On Hold
+APP1020,JOB002,HS067,Javier Morales,Internal ATS (Comeet),2025-11-21,Rejected
+APP1021,JOB001,HS071,Patrick Duval,Internal ATS (Comeet),2024-10-08,In Review
+APP1022,JOB001,HS072,Marta Kowalska,Internal ATS (Comeet),2024-06-03,New
+APP1023,JOB004,HS074,Claudia Vogel,Internal ATS (Comeet),2024-12-19,New
+APP1024,JOB002,,Gil Avraham,Internal ATS (Comeet),2025-04-26,New
+APP1025,JOB004,,Yael Barnea,Internal ATS (Comeet),2025-01-04,In Review
+APP1026,JOB001,,Omar Sheikh,Internal ATS (Comeet),2025-03-14,Phone Screen
+APP1027,JOB003,,Tania Ruiz,Internal ATS (Comeet),2025-06-02,In Review
+APP1028,JOB001,,Leo Fischer,Internal ATS (Comeet),2025-06-04,Phone Screen

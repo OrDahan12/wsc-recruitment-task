@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Solution Manager — Take-Home Task</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+      color: white;
+      padding: 48px 40px 40px;
+    }
+    .header .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .header p { font-size: 16px; opacity: 0.75; max-width: 640px; }
+    .meta-bar {
+      background: #fff;
+      border-bottom: 1px solid #e8ecf0;
+      padding: 14px 40px;
+      display: flex;
+      gap: 32px;
+      font-size: 13px;
+      color: #555;
+    }
+    .meta-bar span strong { color: #1a1a2e; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 40px 80px; }
+    .section { margin-bottom: 40px; }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f3460;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e8ecf0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .num {
+      background: #0f3460;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    h3 { font-size: 15px; font-weight: 600; color: #1a1a2e; margin: 20px 0 8px; }
+    p { margin-bottom: 12px; font-size: 15px; color: #333; }
+    ul, ol { padding-left: 22px; margin-bottom: 12px; }
+    li { margin-bottom: 6px; font-size: 15px; color: #333; }
+
+    .callout {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .callout.blue { background: #eef4ff; border-left: 4px solid #3b82f6; }
+    .callout.yellow { background: #fffbeb; border-left: 4px solid #f59e0b; }
+    .callout.green { background: #f0fdf4; border-left: 4px solid #22c55e; }
+    .callout.red { background: #fff1f2; border-left: 4px solid #ef4444; }
+    .callout strong { display: block; margin-bottom: 6px; }
+
+    .data-files {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .data-file {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .data-file .filename {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f3460;
+      background: #f0f4ff;
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .data-file .desc { font-size: 13px; color: #555; margin-bottom: 8px; }
+    .data-file .fields { font-size: 12px; color: #888; font-family: monospace; }
+
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 24px 0;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: white;
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      text-align: center;
+      min-width: 120px;
+      flex: 1;
+    }
+    .flow-step .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .flow-step strong { display: block; font-size: 12px; color: #0f3460; }
+    .flow-arrow {
+      font-size: 20px;
+      color: #94a3b8;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .deliverable {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .deliverable .badge {
+      background: #0f3460;
+      color: white;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .deliverable .badge.optional { background: #64748b; }
+    .deliverable-text strong { display: block; margin-bottom: 4px; font-size: 15px; }
+    .deliverable-text span { font-size: 13px; color: #666; }
+
+    .assumption-box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 12px;
+    }
+    .assumption-box ol { counter-reset: item; list-style: none; padding: 0; }
+    .assumption-box ol li {
+      counter-increment: item;
+      padding: 8px 0 8px 32px;
+      position: relative;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .assumption-box ol li:last-child { border-bottom: none; }
+    .assumption-box ol li::before {
+      content: counter(item);
+      background: #e8ecf0;
+      color: #0f3460;
+      font-weight: 700;
+      font-size: 11px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 0;
+      top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th {
+      background: #f0f4ff;
+      color: #0f3460;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td { padding: 9px 12px; border-bottom: 1px solid #f1f5f9; color: #444; }
+    tr:last-child td { border-bottom: none; }
+
+    .footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      margin-top: 60px;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+      background: #f0f4ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #0f3460;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="tag">Take-Home Assignment</div>
+  <h1>AI Solution Manager — Recruitment Task</h1>
+  <p style="color: rgba(255,255,255,0.45);">Design and build a system that captures conference attendees as talent leads, enriches them with LinkedIn data, and surfaces the right candidates when a role opens up.</p>
+</div>
+
+<div class="meta-bar">
+  <span><strong>Role:</strong> AI Solution Manager</span>
+  <span><strong>Expected effort:</strong> 1–2 working days</span>
+  <span><strong>Time to submit:</strong> 4–5 days from receipt</span>
+  <span><strong>Language:</strong> English</span>
+</div>
+
+<div class="container">
+
+  <!-- BACKGROUND -->
+  <div class="section">
+    <h2><span class="num">1</span> Background</h2>
+    <p>
+      TalentOps is the recruiting team at a fast-growing sports-tech company. The team attends multiple industry conferences each year
+      to source top engineering and product talent. These events are among their best channels — the people in the room are often
+      exactly the kind of candidates they're looking for.
+    </p>
+    <p>
+      The problem: <strong>today, conference contacts are not captured anywhere.</strong> Recruiters exchange business cards, jot notes
+      on their phones, or scan badges — but nothing lands in a structured system. Within days of the conference, most of these contacts
+      are forgotten. There is no talent pool, no follow-up process, and no way to revisit past event attendees when a new role opens up.
+    </p>
+    <p>
+      Beyond the capture problem, there's a <strong>signal-to-noise challenge</strong>: conference attendees are a mixed crowd
+      even within the conference's own topic. A DevOps conference attracts platform engineers and SREs — but also IT managers,
+      network admins, and vendor sales reps. A data engineering summit draws data engineers and ML practitioners — but also
+      business analysts and consultants who attended for adjacent reasons.
+      Any solution needs to automatically distinguish attendees whose actual role matches the conference domain
+      from those who are just noise — without requiring recruiters to screen everyone manually.
+    </p>
+    <p>
+      The company uses <strong>HubSpot</strong> as a marketing tool — managing campaigns, contacts, and lead flows —
+      and <strong>Comeet</strong> as its ATS for active candidates. The recruiting team also has access to LinkedIn.
+      The vision is to extend HubSpot's existing contact infrastructure into a <em>talent pool</em> —
+      a living bank of passive candidates organized by domain, enriched with LinkedIn data,
+      and queryable whenever a new role opens up.
+    </p>
+
+    <div class="callout blue">
+      <strong>Your mission</strong>
+      Design and build a system that: (1) establishes a process for capturing conference attendees as structured leads, (2) enriches those contacts with LinkedIn profile data to assess domain relevance, (3) filters and matches them against a specific open role, and (4) surfaces mutual connections with current employees who could provide a reference — all outputting into a HubSpot-ready format.
+    </div>
+
+    <div class="callout yellow">
+      <strong>Note on the data files</strong>
+      Because this is a take-home task, the CSV files provided simulate the <em>end state</em> of what a real system would produce — conference attendees as if they had already been captured and exported, LinkedIn data as if it had been pulled via API. Part of your design document should explain how you would build the capture and enrichment layer in a real deployment.
+    </div>
+  </div>
+
+  <!-- DATA -->
+  <div class="section">
+    <h2><span class="num">2</span> Available Data</h2>
+    <p>All data files are in the <code>data/</code> folder. They simulate exports from real systems.</p>
+
+    <div class="data-files">
+      <div class="data-file">
+        <div class="filename">conference_attendees.csv</div>
+        <div class="desc">Simulated attendee list across 4 industry conferences (Nov 2024 – Apr 2025). 75 contacts, mixed domains and relevance — as if captured and structured by the system you are building.</div>
+        <div class="fields">hubspot_id · full_name · email · company · title · conference_name · conference_date · source · notes · linkedin_url</div>
+      </div>
+      <div class="data-file">
+        <div class="filename">linkedin_profiles.csv</div>
+        <div class="desc">LinkedIn data for each attendee — skills, industry, experience, and mutual connections with WSC employees.</div>
+        <div class="fields">linkedin_url · full_name · current_company · current_title · location · years_experience · top_skills · industry · past_companies · wsc_mutual_connections</div>
+      </div>
+      <div class="data-file">
+        <div class="filename">wsc_employees.csv</div>
+        <div class="desc">Current employee roster — used to identify mutual LinkedIn connections and potential references.</div>
+        <div class="fields">employee_id · full_name · title · department · linkedin_id</div>
+      </div>
+      <div class="data-file">
+        <div class="filename">job_openings.csv</div>
+        <div class="desc">Active open positions. Your pipeline should accept a job_id as input and tailor its output accordingly.</div>
+        <div class="fields">job_id · title · department · seniority · key_domains · required_skills · nice_to_have</div>
+      </div>
+    </div>
+
+    <div class="callout yellow">
+      <strong>Important — data limitations to be aware of</strong>
+      Not every conference attendee has a matching LinkedIn profile (in real life, some people don't share LinkedIn URLs or have private profiles).
+      Not every LinkedIn profile has mutual connections. Your pipeline should handle missing data gracefully and document how it does so.
+    </div>
+  </div>
+
+  <!-- WHAT TO BUILD -->
+  <div class="section">
+    <h2><span class="num">3</span> What to Build</h2>
+    <p>Build an automated pipeline (script, notebook, or small app — your choice of language/framework) that uses the provided data files to help a recruiter identify the right candidates for a selected open role.</p>
+
+    <p>As part of your submission, we expect you to:</p>
+    <ul>
+      <li><strong>Define the schema and flow</strong> — before building, map out what your pipeline does at each step: what goes in, what happens, and what comes out. This can be a written description, a diagram, or a flow chart — whatever communicates your thinking clearly.</li>
+      <li><strong>Define the output</strong> — decide what the output looks like and what fields it contains. The output should be structured and usable by a recruiter without additional processing.</li>
+      <li><strong>Build it</strong> — implement the pipeline end-to-end, runnable against the provided CSV files with a selected <code>job_id</code> as input.</li>
+    </ul>
+
+    <div class="callout green">
+      <strong>Bonus (optional but impressive)</strong>
+      Add a simple HTML or CLI summary view that presents the results in a way a recruiter could actually use — without opening a spreadsheet.
+    </div>
+  </div>
+
+  <!-- DELIVERABLES -->
+  <div class="section">
+    <h2><span class="num">4</span> Deliverables</h2>
+
+    <div class="deliverable">
+      <div class="badge">Required</div>
+      <div class="deliverable-text">
+        <strong>Working pipeline code</strong>
+        <span>Script, notebook, or small app. Must be runnable with the provided CSV files. Include a README with setup instructions (dependencies, how to run, which job_id to use for demo).</span>
+      </div>
+    </div>
+
+    <div class="deliverable">
+      <div class="badge">Required</div>
+      <div class="deliverable-text">
+        <strong>Output CSV for at least one job opening</strong>
+        <span>Run your pipeline against <code>JOB001</code> (Senior ML Engineer) and include the output file in your submission.</span>
+      </div>
+    </div>
+
+    <div class="deliverable">
+      <div class="badge">Required</div>
+      <div class="deliverable-text">
+        <strong>Design document (1–2 pages or a well-structured README section)</strong>
+        <span>Explain: Why you chose this approach. What tools/integrations you'd use in a real production version (think: actual LinkedIn API, HubSpot API, Comeet webhook). What the pipeline would look like at scale (hundreds of conferences, thousands of contacts). What you'd add if you had more time.</span>
+      </div>
+    </div>
+
+    <div class="deliverable">
+      <div class="badge">Required</div>
+      <div class="deliverable-text">
+        <strong>Stated assumptions</strong>
+        <span>List all assumptions you made about data quality, business logic, or scope. See the assumptions section below for guidance.</span>
+      </div>
+    </div>
+
+    <div class="deliverable">
+      <div class="badge optional">Optional</div>
+      <div class="deliverable-text">
+        <strong>Executive summary (5 minutes verbal or 1 short paragraph)</strong>
+        <span>Pretend you're presenting this to the Head of HR who is non-technical. What problem does it solve, and why should they care? This can be included in your README or presented during the debrief call.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSUMPTIONS -->
+  <div class="section">
+    <h2><span class="num">5</span> Assumptions to Address</h2>
+    <p>
+      Before writing a line of code, document your assumptions. A strong submission will state these clearly upfront.
+      Below are the key questions you should answer (either by making an assumption or by asking):
+    </p>
+    <p>You don't need to implement a solution for every item below — but be ready to share your thinking on how you'd approach them.</p>
+    <div class="assumption-box">
+      <ol>
+        <li>How do you define "domain relevance"? A DevOps conference has a clear domain — but how do you determine whether a specific attendee is genuinely a DevOps/platform/SRE professional vs. an IT manager or a vendor rep who happened to attend?</li>
+        <li>How do you handle a contact with no LinkedIn profile match in the data? Do they get filtered out, or kept with a lower relevance indication?</li>
+        <li>Is a candidate with 1 mutual connection treated the same as one with 3? Or does the number of connections matter?</li>
+        <li>Should candidates already in the ATS (Comeet) be flagged differently — e.g., previously rejected candidates?</li>
+        <li>What is the intended refresh cadence? Is this a one-time batch job or something that runs after every conference?</li>
+        <li>In a real deployment, who triggers the pipeline — a recruiter manually, or an automated trigger (e.g., after a conference badge scan export)?</li>
+        <li>Are there privacy/GDPR considerations that would affect how you store or process LinkedIn data at scale?</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- EVALUATION -->
+  <div class="section">
+    <h2><span class="num">6</span> What We're Looking For</h2>
+    <table>
+      <tr><th>Dimension</th><th>What a strong submission looks like</th></tr>
+      <tr>
+        <td><strong>Problem understanding</strong></td>
+        <td>Clearly frames the core pain (signal-to-noise in recruiting), not just the technical task</td>
+      </tr>
+      <tr>
+        <td><strong>Solution design</strong></td>
+        <td>Explains why each step exists and what real integrations would replace the CSV mocks</td>
+      </tr>
+      <tr>
+        <td><strong>Scoring logic</strong></td>
+        <td>Transparent, documented methodology — not a black box</td>
+      </tr>
+      <tr>
+        <td><strong>Code quality</strong></td>
+        <td>Clean, readable, modular — another engineer could extend it</td>
+      </tr>
+      <tr>
+        <td><strong>Edge case handling</strong></td>
+        <td>Missing profiles, no mutual connections, partial skill matches — all handled gracefully</td>
+      </tr>
+      <tr>
+        <td><strong>Assumptions</strong></td>
+        <td>Explicit and well-reasoned — shows critical thinking about real-world constraints</td>
+      </tr>
+      <tr>
+        <td><strong>Communication</strong></td>
+        <td>Can explain the system to a non-technical audience in plain language</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- SUBMISSION -->
+  <div class="section">
+    <h2><span class="num">7</span> Submission</h2>
+    <p>
+      Share a link to a <strong>GitHub repository</strong> (or zip file) containing all code, data outputs, and your design document.
+      Make sure the repo includes a <code>README.md</code> with setup and run instructions.
+    </p>
+    <div class="callout red">
+      <strong>Do not</strong> include any real personal data, real API keys, or attempt to connect to live LinkedIn, HubSpot, or Comeet accounts.
+      Work entirely with the provided CSV files.
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  AI Solution Manager Recruitment Task &nbsp;·&nbsp; Confidential — for candidate use only
+</div>
+
+</body>
+</html>

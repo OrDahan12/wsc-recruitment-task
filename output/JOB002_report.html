@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Candidate Shortlist — Backend Engineer</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+         background:#f1f5f9; color:#1e293b; line-height:1.55; }
+  .hero { background:linear-gradient(135deg,#0f3460,#16213e); color:#fff; padding:32px 40px; }
+  .hero .tag { font-size:12px; letter-spacing:1px; text-transform:uppercase; opacity:.7; }
+  .hero h1 { font-size:26px; margin:6px 0; }
+  .hero p { opacity:.75; font-size:14px; }
+  .stats { display:flex; gap:14px; flex-wrap:wrap; padding:20px 40px; background:#fff;
+           border-bottom:1px solid #e2e8f0; }
+  .stat { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 18px; min-width:130px; }
+  .stat .n { font-size:24px; font-weight:700; color:#0f3460; }
+  .stat .l { font-size:12px; color:#64748b; }
+  .wrap { max-width:900px; margin:0 auto; padding:24px 20px 60px; }
+  .card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:20px; margin-bottom:16px;
+          box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .card-head { display:flex; gap:14px; align-items:flex-start; }
+  .rank { font-size:13px; font-weight:700; color:#94a3b8; padding-top:4px; }
+  .who { flex:1; }
+  .who h3 { font-size:18px; }
+  .who p { font-size:13px; color:#475569; }
+  .who .src { color:#94a3b8; font-size:12px; }
+  .score-box { text-align:center; }
+  .score { font-size:30px; font-weight:800; color:#0f3460; }
+  .tier { color:#fff; font-size:11px; font-weight:700; border-radius:20px; padding:2px 10px; display:inline-block; }
+  .flags { display:flex; gap:6px; flex-wrap:wrap; margin:10px 0; }
+  .flag { font-size:11px; font-weight:600; color:var(--fc); border:1px solid var(--fc);
+          border-radius:20px; padding:1px 9px; background:color-mix(in srgb, var(--fc) 8%, white); }
+  .metrics { display:grid; grid-template-columns:1fr 1fr; gap:6px 22px; margin:12px 0; }
+  .metric-label { display:flex; justify-content:space-between; font-size:12px; color:#475569; }
+  .metric-track { background:#e2e8f0; border-radius:6px; height:7px; margin-top:2px; }
+  .metric-fill { background:#0f3460; height:7px; border-radius:6px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:12px;
+           border-top:1px solid #f1f5f9; padding-top:12px; }
+  .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#94a3b8;
+                   font-weight:700; margin-bottom:6px; }
+  .chip { display:inline-block; font-size:12px; border-radius:6px; padding:2px 8px; margin:0 4px 4px 0; }
+  .chip-ok { background:#dcfce7; color:#166534; }
+  .chip-miss { background:#fee2e2; color:#991b1b; }
+  .refs { list-style:none; font-size:13px; }
+  .refs li { padding:3px 0; }
+  .rel { font-size:11px; font-weight:600; color:var(--rc); border:1px solid var(--rc);
+         border-radius:20px; padding:0 7px; margin-left:4px;
+         background:color-mix(in srgb, var(--rc) 8%, white); white-space:nowrap; }
+  .muted { color:#94a3b8; font-size:13px; }
+  .notes { background:#fffbeb; border-left:3px solid #f59e0b; padding:8px 12px; border-radius:6px;
+           font-size:13px; margin-top:12px; color:#78350f; }
+  .action { margin-top:12px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a;
+            border-radius:8px; padding:10px 14px; font-size:14px; font-weight:600; }
+</style></head><body>
+  <div class="hero">
+    <div class="tag">Talent Pool · Candidate Shortlist</div>
+    <h1>Backend Engineer <span style="opacity:.6;font-size:16px;">(JOB002)</span></h1>
+    <p>Engineering · Mid-Senior · domains: Video Processing, Distributed Systems, APIs</p>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="n">75</div><div class="l">Attendees screened</div></div>
+    <div class="stat"><div class="n">27</div><div class="l">Relevant candidates</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">Strong matches</div></div>
+    <div class="stat"><div class="n">27</div><div class="l">With warm intro</div></div>
+    <div class="stat"><div class="n">28</div><div class="l">Filtered as noise</div></div>
+  </div>
+  <div class="wrap">
+    <p class="muted" style="margin-bottom:14px;">Showing top 15 of 75 screened attendees, ranked by match score.</p>
+    
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#1</div>
+        <div class="who">
+          <h3>Chris Lee</h3>
+          <p>Senior Backend Engineer · Sportradar · Vienna AT · 8 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">72</div>
+          <div class="tier" style="background:#16a34a">Strong Match</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>67%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:67%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>62%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:62%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>83%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:83%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>65%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:65%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Go</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">Microservices</span><span class="chip chip-ok">REST APIs</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">AWS</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Michal Barak</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 5 yrs at Sportradar on data feeds</p>
+      <div class="action">👉 Reach out now — strong fit with a warm intro via Michal Barak.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#2</div>
+        <div class="who">
+          <h3>Owen Jackson</h3>
+          <p>Backend Engineer · Fox Sports Digital · Los Angeles US · 6 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-15)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">69</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>60%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:60%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>51%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:51%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>83%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:83%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Go</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Yuval Stern</strong> — DevOps Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Streaming infrastructure for live sports</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Tal Mizrahi.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#3</div>
+        <div class="who">
+          <h3>Sophie Martin</h3>
+          <p>Senior Platform Engineer · StreamOTT · Paris FR · 7 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">67</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>47%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:47%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>43%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:43%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Go</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#0f766e">worked together @ Akamai</span></li><li><strong>Yuval Stern</strong> — DevOps Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#0f766e">worked together @ Akamai</span></li><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Works on live sports streaming pipeline</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via David Cohen.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#4</div>
+        <div class="who">
+          <h3>Rachel Kim</h3>
+          <p>Backend Engineer · MediaPipe Co · Seoul KR · 4 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">66</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>53%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:53%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>55%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:55%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>75%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:75%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Go</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">REST APIs</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">AWS</span><span class="chip chip-miss">Microservices</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Tal Mizrahi.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#5</div>
+        <div class="who">
+          <h3>Viktor Novak</h3>
+          <p>Senior Data Engineer · Databricks · Amsterdam NL · 7 yrs</p>
+          <p class="src">Data &amp; AI Summit Europe (2025-03-20)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">65</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>49%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:49%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Hila Peled</strong> — UX Designer <span class="muted">(Product)</span> <span class="rel" style="--rc:#0f766e">worked together @ Booking.com</span></li><li><strong>Roni Bar</strong> — Frontend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#6366f1">shared employer/school @ Booking.com</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Works on Spark optimization and lakehouse</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Hila Peled.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#6</div>
+        <div class="who">
+          <h3>Emily Carter</h3>
+          <p>Video AI Engineer · BroadcastAI · London UK · 8 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">64</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>46%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:46%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>91%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:91%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Omer Levy</strong> — Sports Content Analyst <span class="muted">(Content)</span> <span class="rel" style="--rc:#6366f1">shared employer/school @ BBC R&amp;D</span></li><li><strong>Itai Nahum</strong> — ML Research Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Very strong background in broadcast</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via David Cohen.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#7</div>
+        <div class="who">
+          <h3>Ryan Patel</h3>
+          <p>Senior Data Engineer · DAZN · London UK · 7 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">64</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>47%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:47%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>36%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:36%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Omer Levy</strong> — Sports Content Analyst <span class="muted">(Content)</span> <span class="rel" style="--rc:#0f766e">worked together @ Sky</span></li><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Avi Goldberg</strong> — Data Engineer <span class="muted">(Data)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li><li><strong>Liron Katz</strong> — Sports Data Analyst <span class="muted">(Data)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Works on real-time sports data ingestion at DAZN</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Omer Levy.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#8</div>
+        <div class="who">
+          <h3>Pilar Reyes</h3>
+          <p>Video Streaming Engineer · OTT Latam · Buenos Aires AR · 6 yrs</p>
+          <p class="src">Broadcast &amp; Streaming Technology Expo (2025-02-06)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">63</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>56%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:56%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>83%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:83%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Live sports streaming for Latin American broadcasters</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via David Cohen.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#9</div>
+        <div class="who">
+          <h3>Nia Campbell</h3>
+          <p>Senior Video Engineer · BBC Sport · London UK · 7 yrs</p>
+          <p class="src">Broadcast &amp; Streaming Technology Expo (2025-02-06)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">63</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>56%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:56%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>83%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:83%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Itai Nahum</strong> — ML Research Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Real-time highlight clipping pipeline at BBC</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via David Cohen.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#10</div>
+        <div class="who">
+          <h3>Liam Harris</h3>
+          <p>Senior Backend Engineer · KINEXON Sports · Munich DE · 7 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-15)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">63</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#94a3b8">Recently started</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>46%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:46%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>72%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:72%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Go</span><span class="chip chip-ok">Kafka</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">AWS</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Michal Barak</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#0f766e">worked together @ KINEXON Sports</span></li><li><strong>Tal Mizrahi</strong> — Backend Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Real-time IoT data processing for sports</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Michal Barak.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#11</div>
+        <div class="who">
+          <h3>David Strauss</h3>
+          <p>Senior Video Platform Engineer · NBA · New York US · 9 yrs</p>
+          <p class="src">Broadcast &amp; Streaming Technology Expo (2025-02-07)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">63</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>33%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:33%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>45%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:45%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#0f766e">worked together @ Akamai Media</span></li><li><strong>Yuval Stern</strong> — DevOps Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#0f766e">worked together @ Akamai Media</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 League Pass streaming infrastructure globally</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via David Cohen.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#12</div>
+        <div class="who">
+          <h3>Scarlett Green</h3>
+          <p>Senior Data Engineer · NFL · New York US · 8 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-15)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">62</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>40%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:40%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>32%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:32%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">Kafka</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Avi Goldberg</strong> — Data Engineer <span class="muted">(Data)</span> <span class="rel" style="--rc:#0f766e">worked together @ Nielsen Sports</span></li><li><strong>Liron Katz</strong> — Sports Data Analyst <span class="muted">(Data)</span> <span class="rel" style="--rc:#6366f1">shared employer/school @ Nielsen Sports</span></li><li><strong>Itai Nahum</strong> — ML Research Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Player analytics and game data at NFL</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Avi Goldberg.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#13</div>
+        <div class="who">
+          <h3>Chiara Russo</h3>
+          <p>Senior ML Engineer - Video · Mediaset · Milan IT · 7 yrs</p>
+          <p class="src">Broadcast &amp; Streaming Technology Expo (2025-02-06)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">61</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>33%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:33%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>45%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:45%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Omer Levy</strong> — Sports Content Analyst <span class="muted">(Content)</span> <span class="rel" style="--rc:#0f766e">worked together @ Sky Italia</span></li><li><strong>Itai Nahum</strong> — ML Research Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li><li><strong>Maya Levi</strong> — Senior ML Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Automated sports clipping and captioning</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Omer Levy.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#14</div>
+        <div class="who">
+          <h3>Priya Anand</h3>
+          <p>Senior Computer Vision Engineer · VidStream · Tel Aviv IL · 7 yrs</p>
+          <p class="src">SportsTech Innovation Summit (2024-11-14)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">61</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>33%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:33%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>42%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:42%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>85%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:85%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Maya Levi</strong> — Senior ML Engineer <span class="muted">(AI/ML)</span> <span class="rel" style="--rc:#0f766e">worked together @ Mobileye</span></li><li><strong>Eran Moshe</strong> — CTO <span class="muted">(Leadership)</span> <span class="rel" style="--rc:#94a3b8">mutual</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Spoke about real-time tracking project</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Maya Levi.</div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="rank">#15</div>
+        <div class="who">
+          <h3>Tobias Braun</h3>
+          <p>ML Solutions Architect · Amazon Web Services · Berlin DE · 8 yrs</p>
+          <p class="src">Data &amp; AI Summit Europe (2025-03-21)</p>
+        </div>
+        <div class="score-box">
+          <div class="score">60</div>
+          <div class="tier" style="background:#f59e0b">Potential</div>
+        </div>
+      </div>
+
+      <div class="flags"><span class="flag" style="--fc:#2563eb">Movable (2-4 yrs)</span><span class="flag" style="--fc:#0f766e">Worked with an employee</span><span class="flag" style="--fc:#16a34a">Warm intro</span><span class="flag" style="--fc:#f59e0b">Partial skills</span></div>
+
+      <div class="metrics">
+        
+      <div class="metric">
+        <div class="metric-label"><span>Skill match</span><span>27%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:27%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Domain relevance</span><span>41%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:41%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Seniority fit</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Referral strength</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+        
+      <div class="metric">
+        <div class="metric-label"><span>Stability / movability</span><span>100%</span></div>
+        <div class="metric-track"><div class="metric-fill" style="width:100%"></div></div>
+      </div>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <div class="section-label">Matched skills</div>
+          <span class="chip chip-ok">Python</span><span class="chip chip-ok">AWS</span>
+          <div class="section-label" style="margin-top:10px;">Missing skills</div>
+          <span class="chip chip-miss">Go</span><span class="chip chip-miss">Kafka</span><span class="chip chip-miss">Microservices</span><span class="chip chip-miss">REST APIs</span>
+        </div>
+        <div>
+          <div class="section-label">🤝 Internal references</div>
+          <ul class="refs"><li><strong>Omer Levy</strong> — Sports Content Analyst <span class="muted">(Content)</span> <span class="rel" style="--rc:#0f766e">worked together @ Sky Deutschland</span></li><li><strong>David Cohen</strong> — VP Engineering <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li><li><strong>Yuval Stern</strong> — DevOps Engineer <span class="muted">(Engineering)</span> <span class="rel" style="--rc:#16a34a">same team</span></li></ul>
+        </div>
+      </div>
+
+      <p class="notes">📝 Sports &amp; media verticals at AWS EMEA</p>
+      <div class="action">👉 Worth a conversation — partial fit; leverage intro via Omer Levy.</div>
+    </div>
+  </div>
+</body></html>

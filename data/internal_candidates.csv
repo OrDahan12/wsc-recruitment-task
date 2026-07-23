@@ -1,0 +1,6 @@
+﻿employee_id,full_name,current_title,department,years_in_role,years_experience,target_job_id,skills,expected_salary,note
+WSC013,Itai Nahum,ML Research Engineer,AI/ML,4,9,JOB001,Python;PyTorch;Computer Vision;Deep Learning;Object Detection;AWS,175000,Strong internal fit; wants to move from research into applied ML product work.
+WSC004,Avi Goldberg,Data Engineer,Data,3,7,JOB002,Python;AWS;Kafka;SQL;Airflow;Microservices,140000,Data engineer looking to move into backend; solid platform overlap.
+WSC008,Liron Katz,Sports Data Analyst,Data,3,8,JOB004,Python;SQL;Spark;Sports Analytics;dbt;Airflow,130000,Sports-domain analyst upskilling into data engineering; deep domain knowledge.
+WSC010,Hila Peled,UX Designer,Product,3,6,JOB003,Product Management;Stakeholder Management;UX;Sports Analytics,150000,Designer pivoting to product; strong stakeholder and user-research background.
+WSC006,Tal Mizrahi,Backend Engineer,Engineering,5,9,JOB004,Python;AWS;Kafka;SQL;Microservices;REST APIs,145000,Tenured backend engineer seeking a data-platform move; strong retention win.
