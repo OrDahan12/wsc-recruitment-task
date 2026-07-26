@@ -69,9 +69,8 @@ TIER_POTENTIAL = 50
 TIER_LOW = 30
 
 # Relationship types for a warm intro, strongest first, with their base weight.
-# "recommendation" = an EXTERNAL person wrote a public LinkedIn recommendation
-# AND is connected to a WSC employee (a bridge): explicit positive sentiment +
-# a warm path in — the strongest signal of all.
+# "recommendation" = a WSC employee publicly recommended the candidate on LinkedIn:
+# explicit positive sentiment + a warm path in — the strongest signal of all.
 # "worked_together" = a WSC employee overlapped in time at the same org — they
 # can speak first-hand, but it is a reference OPPORTUNITY, not a guaranteed
 # endorsement. "same_org" = same employer/school but no time overlap.
@@ -83,7 +82,7 @@ RELATION_STRENGTH = {
     "mutual": 0.45,
 }
 RELATION_LABEL = {
-    "recommendation": "Recommended (bridge to WSC)",
+    "recommendation": "LinkedIn recommendation",
     "worked_together": "Worked together",
     "mutual_same_dept": "Mutual (same team)",
     "same_org": "Shared employer/school",
@@ -326,26 +325,31 @@ def score_referral(cand: Candidate, job: Job, employees: Dict[str, Employee]):
         if relation:
             _consider(emp, relation, org)
 
-    referrals = list(by_emp.values())
-
-    # Source 3: external LinkedIn recommendations that bridge to a WSC employee.
-    # These are separate people (not employees), so they are appended directly.
+    # Source 3: LinkedIn recommendations written by a WSC employee.
+    # The employee already exists in the referral graph, so the recommendation
+    # upgrades that existing warm intro path and carries the note text.
     for rec in cand.recommendations:
-        if rec.get("is_wsc_employee"):
-            continue  # an employee's own recommendation is handled via mutuals
         bridge_id = rec.get("wsc_bridge_employee_id", "")
         bridge_emp = employees.get(bridge_id)
-        bridge_name = bridge_emp.full_name if bridge_emp else bridge_id
-        referrals.append(Referral(
-            employee_name=rec.get("recommender_name", ""),
-            employee_title=f"{rec.get('recommender_title', '')} @ {rec.get('recommender_company', '')}".strip(" @"),
-            department="External",
-            same_department=False,
-            relation="recommendation",
-            is_external=True,
-            bridge_employee=bridge_name,
-            note=rec.get("text", ""),
-        ))
+        if not bridge_emp:
+            continue
+        existing = by_emp.get(bridge_emp.employee_id)
+        if existing is None:
+            by_emp[bridge_emp.employee_id] = Referral(
+                employee_name=bridge_emp.full_name,
+                employee_title=bridge_emp.title,
+                department=bridge_emp.department,
+                same_department=bridge_emp.department.strip().lower() == job.department.strip().lower(),
+                relation="recommendation",
+                shared_org="WSC Sports",
+                note=rec.get("text", ""),
+            )
+            continue
+        existing.relation = "recommendation"
+        existing.note = rec.get("text", "")
+        existing.shared_org = existing.shared_org or "WSC Sports"
+
+    referrals = list(by_emp.values())
 
     if not referrals:
         return 0.0, referrals

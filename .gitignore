@@ -23,3 +23,7 @@ Thumbs.db
 
 # Internal handoff notes
 WSC_TASK_SUMMARY.md
+
+# PowerPoint temporary files
+~$*.pptx
+presentation/

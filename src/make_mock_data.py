@@ -57,11 +57,14 @@ ATS_STATUS = ["New", "In Review", "Phone Screen", "Rejected", "On Hold"]
 # salary expectations against this. It is a *business constraint*, kept separate
 # from the merit-based match score (a great candidate slightly over budget is a
 # negotiation, not a disqualification).
+# opened_date lets the dashboard mark a role "New" (opened recently). Anchored to
+# the dataset timeframe (conferences ran Nov 2024-Apr 2025); reference "today" in
+# the dashboard is 2025-05-01, so roles opened in late April read as New.
 JOB_BUDGETS = {
-    "JOB001": {"budget_min": 150000, "budget_max": 190000, "currency": "USD"},
-    "JOB002": {"budget_min": 120000, "budget_max": 155000, "currency": "USD"},
-    "JOB003": {"budget_min": 140000, "budget_max": 180000, "currency": "USD"},
-    "JOB004": {"budget_min": 115000, "budget_max": 150000, "currency": "USD"},
+    "JOB001": {"budget_min": 150000, "budget_max": 190000, "currency": "USD", "opened_date": "2025-04-25"},
+    "JOB002": {"budget_min": 120000, "budget_max": 155000, "currency": "USD", "opened_date": "2025-02-10"},
+    "JOB003": {"budget_min": 140000, "budget_max": 180000, "currency": "USD", "opened_date": "2025-04-20"},
+    "JOB004": {"budget_min": 115000, "budget_max": 150000, "currency": "USD", "opened_date": "2025-03-05"},
 }
 
 # Internal employees who are open to moving into a newly opened role. Modeled
@@ -271,7 +274,7 @@ def make_job_budgets():
     """Write the per-role budget ceilings (simulated; from Finance/HR in production)."""
     path = os.path.join(DATA, "job_budgets.csv")
     with open(path, "w", newline="", encoding="utf-8-sig") as fh:
-        w = csv.DictWriter(fh, fieldnames=["job_id", "budget_min", "budget_max", "currency"])
+        w = csv.DictWriter(fh, fieldnames=["job_id", "budget_min", "budget_max", "currency", "opened_date"])
         w.writeheader()
         for job_id, b in JOB_BUDGETS.items():
             w.writerow({"job_id": job_id, **b})
@@ -294,8 +297,10 @@ def make_internal_candidates():
 
 def main():
     attendees = load_attendees()
-    profiles = load_profiles()    employees = load_employees()    n_apps, p_apps, apps = make_internal_applications(attendees)
-    n_recs, p_recs = make_recommendations(attendees, profiles)
+    profiles = load_profiles()
+    employees = load_employees()
+    n_apps, p_apps, apps = make_internal_applications(attendees)
+    n_recs, p_recs = make_recommendations(attendees, profiles, employees)
     n_sal, p_sal = make_salary_expectations(attendees, profiles, apps)
     n_bud, p_bud = make_job_budgets()
     n_int, p_int = make_internal_candidates()

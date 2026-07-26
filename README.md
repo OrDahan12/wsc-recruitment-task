@@ -1,15 +1,15 @@
-# Conference Talent-Pool Matching Pipeline
+# ScoutBoard — Conference Talent-Pool Matching Pipeline
 
 Turn conference attendee lists into a **living, queryable talent pool** — so that when a role
 opens, a recruiter instantly gets a ranked shortlist of the right people, complete with a
 **warm-intro path through current employees**.
 
-Built for the *AI Solution Manager* take-home task.
+Built for the *AI Solution Manager* take-home task at WSC Sports.
 
 > **Start here:** the recruiter-facing deliverable is the interactive **`output/dashboard.html`**
 > — a single self-contained page (no server, no install) with tabs for Conferences, Open Jobs,
-> and an interactive Candidate Match view where clicking the KPIs filters the shortlist and
-> **weight sliders re-rank candidates live**. Build it with `python src/dashboard.py`.
+> and an interactive Candidate Match view where clicking the KPI cards jumps to the relevant list
+> and **weight sliders re-rank candidates live**. Build it with `python src/dashboard.py`.
 
 ---
 

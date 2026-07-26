@@ -356,6 +356,7 @@ def load_job_budgets(data_dir: str) -> Dict[str, dict]:
                     "budget_min": _parse_years(row.get("budget_min", "")),
                     "budget_max": _parse_years(row.get("budget_max", "")),
                     "currency": _norm(row.get("currency")),
+                    "opened_date": _norm(row.get("opened_date")),
                 }
     return budgets
 

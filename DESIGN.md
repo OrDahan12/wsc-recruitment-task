@@ -19,6 +19,54 @@ right people (with a warm intro)**. Everything below serves that framing.
 
 ---
 
+## 1a. Data schema & pipeline flow (at a glance)
+
+**How the data relates.** Every record is anchored to a real person from the provided data. A
+conference attendee (`hubspot_id`) is optionally enriched by a LinkedIn profile; that profile's
+mutual connections and any recommendations point back to real `wsc_employees`. Jobs carry a
+budget and a set of internal applicants.
+
+```mermaid
+erDiagram
+    CONFERENCE_ATTENDEES  ||--o| LINKEDIN_PROFILES      : "enriched by (hubspot_id)"
+    CONFERENCE_ATTENDEES  ||--o{ INTERNAL_APPLICATIONS  : "applied to (hubspot_id)"
+    CONFERENCE_ATTENDEES  ||--o| SALARY_EXPECTATIONS    : "screened for (hubspot_id)"
+    LINKEDIN_PROFILES     }o--o{ WSC_EMPLOYEES          : "mutual connections"
+    WSC_EMPLOYEES         ||--o{ LINKEDIN_RECOMMENDATIONS : "authored (employee_id)"
+    LINKEDIN_RECOMMENDATIONS }o--|| CONFERENCE_ATTENDEES : "vouches for (hubspot_id)"
+    WSC_EMPLOYEES         ||--o{ INTERNAL_CANDIDATES     : "is (employee_id)"
+    JOB_OPENINGS          ||--o| JOB_BUDGETS            : "capped by (job_id)"
+    JOB_OPENINGS          ||--o{ INTERNAL_APPLICATIONS  : "receives (job_id)"
+    JOB_OPENINGS          ||--o{ INTERNAL_CANDIDATES    : "targeted by (job_id)"
+```
+
+**How a lead becomes a ranked shortlist.** The pipeline runs per `job_id`: it loads and
+normalizes every attendee (with or without a LinkedIn match), cross-references referral paths
+against real employees, scores each candidate on five signals, gates out off-domain noise, and
+emits a recruiter-ready CSV + dashboard.
+
+```mermaid
+flowchart LR
+    A[Conference attendees] --> N[Load and normalize<br/>keep no-LinkedIn leads]
+    L[LinkedIn profiles] -. optional enrich .-> N
+    N --> E[Enrich: skills, tenure,<br/>mutual connections]
+    W[WSC employees] --> X[Cross-reference<br/>referral paths]
+    R[LinkedIn recommendations] --> X
+    E --> X
+    X --> S[Score per job_id<br/>5 weighted signals]
+    J[Job opening + budget] --> S
+    I[Internal candidates] --> S
+    S --> G{Domain relevance<br/>>= 25%?}
+    G -- no --> Z[Gated out as noise]
+    G -- yes --> O[Ranked shortlist<br/>CSV + interactive dashboard]
+```
+
+> The same engine scores a candidate **once per open role**, so relevance is always
+> role-specific — a product manager with ML skills ranks high for a PM req and lower (or gated)
+> for an ML req. That is how near-adjacent roles are disambiguated rather than lumped together.
+
+---
+
 ## 2. Why this approach
 
 **Rule-based, transparent scoring — not a black-box model.** For a recruiting tool, *trust and
@@ -70,6 +118,7 @@ type rather than counting connections:
 | **Worked together** (same employer *with overlapping years*) | 0.95 | A current employee was an actual colleague — they can give a **first-hand reference**. Detected by cross-referencing candidate work history against employee work history. |
 | **Mutual, same team** | 0.75 | A shared connection who is a domain peer of the role. |
 | **Shared employer / school** (same org, no time overlap) | 0.55 | Same alumni network — warm, but not first-hand. |
+| **LinkedIn recommendation** | 1.0 | A WSC employee publicly vouched for the candidate on LinkedIn. This is the strongest grounded warm-intro signal in the provided data. |
 | **Mutual connection** | 0.45 | A generic shared LinkedIn connection. |
 
 > **Important nuance (a real recruiter's caution):** "worked together" is a
@@ -150,6 +199,8 @@ sources beyond the provided CSVs and are called out rather than faked.
 | **Open-to-work / recent-move status** | Someone signalling *open to work*, or who just left a role, is more reachable; someone 3 months into a new job is unlikely to move. Complements the tenure-based movability we already compute. | LinkedIn "open to work" flag + current-role start date. Adjusts `stability`/movability. |
 | **Beyond LinkedIn — industry presence** | Conference *speakers*, active GitHub authors, personal portfolios, blog/talks — strong competence signals for passive candidates. We already partially capture this from the recruiter `notes` field (e.g. "published papers on sports event detection"). | GitHub API, conference speaker lists, enrichment providers → feed a `credibility` signal. |
 | **Soft skills & culture fit** | The hardest to quantify and often the real make-or-break. Deliberately **not** reduced to a number. | This is exactly where the human reference matters most — hence recommendations and "worked with" connections are surfaced for the recruiter to have a real conversation, not auto-scored. |
+
+> We deliberately did **not** add a layoffs-history signal from LinkedIn or external sources because the provided CSVs do not contain a grounded company-layoff dataset. That kind of signal should only be added once a source and compliance review are in place.
 
 ---
 
@@ -235,6 +286,11 @@ The rule-based core stays the backbone; the LLM is enrichment at the edges.
    keeping adjacent-but-plausible ones.
 2. **Attendee with no LinkedIn match** is **kept, not dropped** — scored on conference data and
    flagged `MISSING_LINKEDIN`. Dropping would silently lose real leads; the recruiter decides.
+   *The provided dataset happened to have 100% LinkedIn coverage, so the source data was left
+   untouched — no synthetic rows were added. The no-LinkedIn path is therefore demonstrated as an
+   illustrative capability (in the design and the presentation) rather than in the real output
+   CSVs: the pipeline scores such a lead on its conference title + recruiter notes alone, sets
+   `referral_strength = 0`, and surfaces it under the "No LinkedIn" filter on the Match tab.*
 3. **Referral quality outranks referral quantity.** A single employee who *worked with* the
    candidate (overlapping years at the same org) outweighs several generic mutual connections.
    Detected by cross-referencing work histories. Crucially, this is treated as a *reference
