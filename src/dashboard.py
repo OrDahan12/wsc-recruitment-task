@@ -5,7 +5,7 @@ Unlike the per-job static report, this is the recruiter's cockpit. It embeds all
 pre-computed data as JSON and uses vanilla JS (no build step, no dependencies) to:
 
   * Overview  — the living talent pool at a glance (conferences + pool + alerts).
-  * Conferences — every event: name, date, domain, # attendees captured.
+  * Conferences — every event, newest first: name, date, domain, # attendees captured.
   * Open Jobs — all active roles, internal ATS applicants vs. talent-pool matches.
   * Match — pick a role, adjust the scoring weights live (sliders), click the KPI
             cards to filter, search the pool, and drill into any candidate.
@@ -83,7 +83,7 @@ def _conferences(candidates: List[Candidate]) -> List[dict]:
                 "attendees": 0,
             }
         agg[key]["attendees"] += 1
-    return sorted(agg.values(), key=lambda d: d["date"])
+    return sorted(agg.values(), key=lambda d: d["date"], reverse=True)
 
 
 def _attendees(candidates: List[Candidate]) -> List[dict]:
@@ -91,16 +91,16 @@ def _attendees(candidates: List[Candidate]) -> List[dict]:
     out = []
     for c in candidates:
         out.append({
-            "name": c.full_name,
-            "title": c.best_title,
-            "company": c.current_company or c.company,
-            "location": c.location,
-            "years": c.years_experience,
-            "conference": c.conference_name,
-            "conference_date": c.conference_date,
-            "department": _classify_department(c),
-            "has_linkedin": c.has_linkedin,
-            "skills": c.top_skills,
+          "name": c.full_name,
+          "title": c.best_title,
+          "company": c.current_company or c.company,
+          "location": c.location,
+          "years": c.years_experience,
+          "conference": c.conference_name,
+          "conference_date": c.conference_date,
+          "department": _classify_department(c),
+          "has_linkedin": c.has_linkedin,
+          "skills": c.top_skills,
         })
     return out
 
@@ -117,7 +117,7 @@ def _scoring_meta() -> dict:
             "seniority_fit": "Years of experience vs. the band the role expects "
                              "(e.g. Senior = 6-14 yrs). Unknown experience scores a neutral 50%.",
             "referral_strength": "Warm-intro potential, ranked by relationship QUALITY not count: "
-                                 "a recommendation or an ex-colleague inside WSC beats a random "
+                                 "a LinkedIn recommendation or an ex-colleague inside WSC beats a random "
                                  "shared connection.",
             "stability": "Retention signal. Penalises job-hoppers and factors 'movability' - "
                          "someone ~2-4 yrs into a role is at the sweet spot to move.",
@@ -287,7 +287,7 @@ def build_payload(data_dir: str) -> dict:
 
 def render(payload: dict) -> str:
     data_js = json.dumps(payload, ensure_ascii=False)
-    return _TEMPLATE.replace("/*__DATA__*/", data_js)
+    return _TEMPLATE.replace("/*DATA_PLACEHOLDER*/", data_js)
 
 
 def main() -> None:
@@ -312,36 +312,59 @@ def main() -> None:
 _TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TalentOps — HR Talent Pool Dashboard</title>
+<title>ScoutBoard - WSC Sports HR Talent Pool</title>
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-         background:#f1f5f9; color:#1e293b; }
-  .topbar { background:linear-gradient(135deg,#0f3460,#16213e); color:#fff; padding:18px 28px;
-            display:flex; align-items:center; justify-content:space-between; }
-  .topbar h1 { font-size:19px; font-weight:700; }
-  .topbar .live { font-size:12px; opacity:.8; display:flex; align-items:center; gap:7px; }
-  .dot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 0 rgba(34,197,94,.6);
-         animation:pulse 2s infinite; }
-  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)} 70%{box-shadow:0 0 0 8px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+         background:
+           radial-gradient(circle at top left, rgba(13,148,136,.10), transparent 28%),
+           radial-gradient(circle at top right, rgba(15,23,42,.09), transparent 24%),
+           linear-gradient(180deg,#f8fbff 0%, #eef3f8 100%);
+         color:#1e293b; }
+  .topbar { background:linear-gradient(180deg,#f8fafc 0%, #eef2f7 100%); color:#0f3460; padding:18px 28px;
+            display:flex; align-items:center; justify-content:space-between; position:relative; overflow:hidden; }
+  .topbar::after { content:""; position:absolute; inset:auto 0 0 0; height:3px;
+                   background:linear-gradient(90deg,#0b6b5d 0%, #38bdf8 44%, #f59e0b 78%, #0f3460 100%);
+                   opacity:.95; }
+  .brand { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
+  .brand-mark { display:flex; align-items:center; }
+  .brand-mark svg { width:140px; height:auto; display:block; }
+  .brand-copy { display:flex; flex-direction:column; gap:3px; }
+  .topbar h1 { font-size:19px; font-weight:900; letter-spacing:.3px; line-height:1; }
+  .brand-sub { display:none; }
+  .topbar .live { font-size:12px; color:#64748b; display:flex; align-items:center; gap:7px; }
+    .dot { width:8px; height:8px; border-radius:50%; background:#0b6b5d; box-shadow:0 0 0 0 rgba(11,107,93,.6);
+      animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(11,107,93,.6)} 70%{box-shadow:0 0 0 8px rgba(11,107,93,0)} 100%{box-shadow:0 0 0 0 rgba(11,107,93,0)} }
   .tabs { display:flex; gap:2px; background:#fff; border-bottom:1px solid #e2e8f0; padding:0 20px; }
   .tab { padding:14px 20px; font-size:14px; font-weight:600; color:#64748b; cursor:pointer;
          border-bottom:3px solid transparent; }
-  .tab:hover { color:#0f3460; }
-  .tab.active { color:#0f3460; border-bottom-color:#0f3460; }
+  .tab:hover { color:#0b6b5d; }
+  .tab.active { color:#0b6b5d; border-bottom-color:#0b6b5d; }
   .page { display:none; max-width:1080px; margin:0 auto; padding:24px 20px 80px; }
   .page.active { display:block; }
   h2 { font-size:18px; color:#0f3460; margin-bottom:4px; }
   .sub { color:#64748b; font-size:13px; margin-bottom:16px; }
+    .hero { background:linear-gradient(135deg, rgba(15,52,96,.06), rgba(11,107,93,.05)); border:1px solid rgba(11,107,93,.14);
+            border-radius:16px; padding:16px 18px; margin:12px 0 18px; box-shadow:0 10px 24px rgba(15,23,42,.04); }
+    .hero-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+        .hero-badge { display:inline-flex; align-items:center; gap:8px; padding:5px 10px; border-radius:999px;
+          background:#0f3460; color:#fff; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+        .hero-kicker { font-size:12px; color:#0b6b5d; font-weight:800; letter-spacing:.12em; text-transform:uppercase; margin-top:10px; }
+        .hero-title { font-size:22px; line-height:1.2; color:#0f3460; font-weight:900; margin-top:6px; }
+    .hero-copy { font-size:13px; color:#475569; line-height:1.7; margin-top:8px; max-width:74ch; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .hero-tag { font-size:11px; font-weight:800; color:#0f3460; background:#fff; border:1px solid #dbe4ee; border-radius:999px; padding:5px 10px; }
   .kpis { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
-  .kpi { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; min-width:132px;
-         cursor:pointer; transition:.15s; }
-  .kpi:hover { border-color:#0f3460; transform:translateY(-1px); }
-  .kpi.active { border-color:#0f3460; box-shadow:0 0 0 2px #0f346022; }
-  .kpi .n { font-size:26px; font-weight:800; color:#0f3460; }
+    .kpi { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; min-width:132px;
+      cursor:pointer; transition:.15s; position:relative; }
+    .kpi:hover { border-color:#0b6b5d; transform:translateY(-1px); box-shadow:0 8px 18px rgba(11,107,93,.08); }
+    .kpi.active { border-color:#0b6b5d; box-shadow:0 0 0 2px #0b6b5d22; }
+    .kpi .n { font-size:26px; font-weight:800; color:#0b6b5d; }
   .kpi .l { font-size:12px; color:#64748b; }
   .kpi.static { cursor:default; }
   .kpi.static:hover { transform:none; border-color:#e2e8f0; }
+    .kpi.clickable::after { content:"↗"; position:absolute; top:10px; right:12px; font-size:11px; color:#94a3b8; }
   table { width:100%; border-collapse:collapse; background:#fff; border:1px solid #e2e8f0;
           border-radius:12px; overflow:hidden; font-size:13px; }
   th { background:#f8fafc; text-align:left; padding:11px 14px; color:#0f3460; font-weight:700;
@@ -358,7 +381,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .flag { font-size:10px; font-weight:700; border:1px solid var(--fc,#94a3b8); color:var(--fc,#94a3b8);
           border-radius:20px; padding:1px 7px; margin:0 3px 3px 0; display:inline-block; }
   .src-int { font-size:9px; font-weight:800; letter-spacing:.4px; text-transform:uppercase;
-             background:#0d9488; color:#fff; border-radius:4px; padding:1px 5px; vertical-align:middle; }
+             background:#0b6b5d; color:#fff; border-radius:4px; padding:1px 5px; vertical-align:middle; }
   .controls { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 18px; margin-bottom:16px; }
   .controls .row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   select, input[type=text] { border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; font-size:14px; }
@@ -376,7 +399,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .drawer { position:fixed; top:0; right:0; width:min(480px,92vw); height:100%; background:#fff; z-index:50;
             box-shadow:-4px 0 20px rgba(0,0,0,.15); transform:translateX(100%); transition:.25s; overflow-y:auto; }
   .drawer.open { transform:translateX(0); }
-  .drawer .dh { background:linear-gradient(135deg,#0f3460,#16213e); color:#fff; padding:22px 24px; }
+  .drawer .dh { background:linear-gradient(135deg,#0f3460,#0b6b5d); color:#fff; padding:22px 24px; }
   .drawer .dh h3 { font-size:20px; }
   .drawer .dh p { opacity:.8; font-size:13px; }
   .drawer .body { padding:20px 24px; }
@@ -392,6 +415,9 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .refbox .note { color:#64748b; font-style:italic; margin-top:4px; font-size:12px; }
   .action { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; border-radius:8px; padding:11px 14px;
             font-size:13px; font-weight:600; margin-top:14px; }
+  .toggle { background:#fff; border:1px solid #cbd5e1; color:#0f3460; border-radius:8px; padding:7px 12px;
+            cursor:pointer; font-size:12px; font-weight:700; }
+  .toggle.on { background:#eef2f7; border-color:#0b6b5d; box-shadow:0 0 0 2px rgba(11,107,93,.08); }
   .muted { color:#94a3b8; }
   .card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 18px; margin-bottom:12px; }
   .note-info { background:#fffbeb; border-left:3px solid #f59e0b; padding:8px 12px; border-radius:6px;
@@ -403,7 +429,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .help { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
           border-radius:50%; background:#cbd5e1; color:#fff; font-size:10px; font-weight:800;
           cursor:help; position:relative; margin-left:5px; vertical-align:middle; flex-shrink:0; }
-  .help:hover { background:#0f3460; }
+  .help:hover { background:#0b6b5d; }
   .help .tip { display:none; position:absolute; bottom:130%; left:50%; transform:translateX(-50%);
                width:250px; background:#0f172a; color:#e2e8f0; font-size:11px; font-weight:400;
                line-height:1.55; text-align:left; padding:9px 11px; border-radius:8px; z-index:60;
@@ -451,28 +477,56 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .mini-table th { background:#f8fafc; padding:6px 10px; font-size:11px; }
   .mini-table td { padding:6px 10px; border-bottom:1px solid #f1f5f9; }
 
+  /* --- active filter banner --- */
+  .activefilter { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:2px 0 14px;
+    padding:10px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; }
+  .activefilter .af-label { font-size:12px; font-weight:700; color:#92400e; }
+  .af-chip { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+    color:#0f3460; background:#fff; border:1px solid #cbd5e1; border-radius:999px; padding:4px 10px; cursor:pointer; }
+  .af-chip:hover { border-color:#0f3460; }
+  .af-chip .af-x { color:#94a3b8; font-weight:700; }
+  .af-chip:hover .af-x { color:#dc2626; }
+  .af-clear { margin-left:auto; font-size:12px; font-weight:700; color:#fff; background:#0f3460;
+    border:none; border-radius:8px; padding:6px 12px; cursor:pointer; }
+  .af-clear:hover { background:#0b2748; }
+  .inforow { font-size:12.5px; color:#7c2d12; background:#fff7ed; border:1px solid #fed7aa;
+    border-radius:8px; padding:8px 10px; margin:8px 0; line-height:1.55; }
+
   /* --- charts --- */
   .charts { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-bottom:18px; }
   .chart { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; }
   .chart h4 { font-size:13px; color:#0f3460; margin-bottom:12px; display:flex; align-items:center; }
   .bars { display:flex; flex-direction:column; gap:9px; }
   .barrow { display:grid; grid-template-columns:120px 1fr 34px; align-items:center; gap:10px; font-size:12px; }
+  .barrow.clickable { cursor:pointer; }
+  .barrow.clickable:hover .bl { color:#0f3460; font-weight:700; }
   .barrow .bl { color:#475569; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .barrow .bt { background:#eef2f7; border-radius:5px; height:14px; overflow:hidden; }
-  .barrow .bt > div { height:14px; border-radius:5px; background:#0f3460; }
+  .barrow .bt > div { height:14px; border-radius:5px; background:#0b6b5d; }
   .barrow .bn { font-weight:700; color:#0f3460; text-align:right; }
   .hist { display:flex; align-items:flex-end; gap:6px; height:120px; padding-top:8px; }
   .hist .hb { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%; }
-  .hist .hb .hbar { width:100%; background:#0f3460; border-radius:4px 4px 0 0; min-height:2px; }
+  .hist .hb.clickable { cursor:pointer; }
+  .hist .hb.clickable:hover .hbar { filter:brightness(0.92); }
+  .hist .hb .hbar { width:100%; background:#0b6b5d; border-radius:4px 4px 0 0; min-height:2px; }
   .hist .hb .hlbl { font-size:10px; color:#94a3b8; }
+  .conf-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+  .conf-card { background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%); border:1px solid #e2e8f0; border-radius:14px; padding:14px 15px; box-shadow:0 1px 0 rgba(15,23,42,.02); }
+  .conf-card.clickable { cursor:pointer; }
+  .conf-card:hover { border-color:#0b6b5d; box-shadow:0 10px 18px rgba(11,107,93,.08); }
+  .conf-top { display:flex; justify-content:space-between; gap:10px; margin-bottom:10px; align-items:center; }
+  .conf-date { font-size:12px; font-weight:800; color:#0b6b5d; background:#ecfdf5; border-radius:999px; padding:3px 9px; white-space:nowrap; }
+  .conf-count { font-size:11px; color:#64748b; white-space:nowrap; }
+  .conf-name { font-size:14px; font-weight:800; color:#0f3460; line-height:1.3; margin-bottom:6px; }
+  .conf-domain { font-size:12px; color:#475569; line-height:1.4; }
 
   /* --- score math + penalties in the drawer --- */
   .mathrow { display:grid; grid-template-columns:1fr auto auto; gap:8px; align-items:center;
              font-size:12px; padding:4px 0; border-bottom:1px solid #f8fafc; }
   .mathrow .mlbl { color:#475569; }
   .mathrow .mcalc { font-family:'Courier New',monospace; color:#94a3b8; font-size:11px; }
-  .mathrow .mpts { font-weight:700; color:#0f3460; text-align:right; min-width:46px; }
-  .mathtot { display:flex; justify-content:space-between; font-weight:800; color:#0f3460; font-size:14px;
+  .mathrow .mpts { font-weight:700; color:#0b6b5d; text-align:right; min-width:46px; }
+  .mathtot { display:flex; justify-content:space-between; font-weight:800; color:#0b6b5d; font-size:14px;
              padding-top:8px; margin-top:4px; border-top:2px solid #e2e8f0; }
   .penbox { border:1px solid #fecaca; background:#fef2f2; border-radius:10px; padding:10px 13px; margin-top:8px; }
   .penrow { font-size:12px; color:#7f1d1d; padding:3px 0; }
@@ -482,8 +536,34 @@ _TEMPLATE = r"""<!DOCTYPE html>
 </style></head><body>
 
 <div class="topbar">
-  <h1>TalentOps · HR Talent Pool</h1>
-  <div class="live"><span class="dot"></span> Living pool — auto-updates after every conference &amp; LinkedIn refresh</div>
+  <div class="brand">
+    <div class="brand-mark" aria-label="WSC Sports logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="170" height="21" viewBox="0 0 170 21" fill="none" class="img-svg replaced-svg">
+        <g clip-path="url(#clip0_1002_16158)">
+          <path d="M40.1758 3.35449H43.6879L45.5328 13.1992H45.7282L48.0046 3.35449H51.2224L53.4987 13.1992H53.6941L55.539 3.35449H59.0131V3.64988L55.9907 17.5307H51.7324L49.6921 8.75047H49.4967L47.4564 17.5307H43.1982L40.1758 3.64988V3.35449Z" fill="#0B0B0B"></path>
+          <path d="M65.6007 3.12012C69.4073 3.12012 71.3689 5.05034 71.5263 7.3931V7.68849H68.1511C68.1308 6.17334 67.0523 5.60038 65.6794 5.60038C64.3065 5.60038 63.4818 6.22936 63.4818 7.13591C63.4818 8.04245 64.2279 8.49318 65.5627 8.77074L67.702 9.20364C70.4097 9.75368 71.9196 10.976 71.9196 13.3569C71.9196 15.7379 70.095 17.7674 66.0525 17.7674C62.0099 17.7674 59.8326 15.7404 59.7539 13.3366V13.0412H63.1671C63.3244 14.5563 64.4233 15.2872 66.0119 15.2872C67.6004 15.2872 68.3871 14.5589 68.3871 13.6141C68.3871 12.6694 67.6994 12.2569 66.1895 11.9411L64.0502 11.5082C61.4212 10.976 59.9493 9.48121 59.9493 7.3549C59.9493 5.2286 61.7942 3.12266 65.6007 3.12266V3.12012Z" fill="#0B0B0B"></path>
+          <path d="M80.1592 3.12012C84.5926 3.12012 86.4781 5.85758 86.5745 8.2589V8.55429H83.1613C83.1029 7.37273 82.3949 5.79646 80.1973 5.79646C77.9996 5.79646 76.6268 7.68594 76.6268 10.4438C76.6268 13.2016 77.921 15.0911 80.1973 15.0911C82.4736 15.0911 83.0826 13.4766 83.2197 12.2161H86.6329V12.5115C86.4172 14.9332 84.6306 17.7674 80.1567 17.7674C75.6827 17.7674 73.0156 14.7753 73.0156 10.4438C73.0156 6.11222 75.6066 3.12012 80.1567 3.12012H80.1592Z" fill="#0B0B0B"></path>
+          <path d="M97.1939 3.13037C100.45 3.13037 102.493 4.68627 102.708 7.20473V7.50012H100.99C100.874 5.384 99.2723 4.52584 97.2218 4.52584C95.1714 4.52584 93.7401 5.40182 93.7401 6.96791C93.7401 8.53399 95.0166 9.04583 96.8894 9.42016L98.5871 9.75375C101.137 10.2656 103.003 11.1619 103.003 13.6524C103.003 16.1428 100.99 17.7573 97.6075 17.7573C94.2248 17.7573 91.9282 16.181 91.6719 13.632V13.3366H93.4077C93.6716 15.4935 95.4378 16.3593 97.5974 16.3593C99.757 16.3593 101.226 15.4935 101.226 13.7593C101.226 12.0252 99.8128 11.6127 97.9095 11.2307L96.2118 10.8971C93.7299 10.4056 91.9637 9.34122 91.9637 7.01884C91.9637 4.69645 93.9253 3.13037 97.1939 3.13037Z" fill="#0B0B0B"></path>
+          <path d="M105.486 3.35449H111.589C114.102 3.35449 116.101 4.7907 116.101 7.41102C116.101 10.0313 114.099 11.4676 111.589 11.4676H107.283V17.5307H105.489V3.35449H105.486ZM107.28 4.7907V10.0364H111.272C113.087 10.0364 114.305 9.10188 114.305 7.40848C114.305 5.71507 113.089 4.7907 111.272 4.7907H107.28Z" fill="#0B0B0B"></path>
+          <path d="M124.354 3.12012C128.328 3.12012 131.054 5.81683 131.054 10.4438C131.054 15.0707 128.326 17.7674 124.354 17.7674C120.383 17.7674 117.645 15.0707 117.645 10.4438C117.645 5.81683 120.373 3.12012 124.354 3.12012ZM124.354 16.3108C127.336 16.3108 129.249 14.1438 129.249 10.4438C129.249 6.74375 127.336 4.5767 124.354 4.5767C121.372 4.5767 119.449 6.74375 119.449 10.4438C119.449 14.1438 121.372 16.3108 124.354 16.3108Z" fill="#0B0B0B"></path>
+          <path d="M144.116 15.3178C144.225 16.204 144.37 16.726 144.694 17.2379V17.5333H142.86C142.586 16.973 142.428 16.4204 142.339 15.4553L142.223 14.0675C142.065 12.2468 141.309 11.5287 138.974 11.5287H135.394V17.5333H133.6V3.35449H139.957C142.548 3.35449 144.519 4.64301 144.519 7.20476C144.519 9.20374 143.42 10.3064 141.86 10.7087V10.9048C143.352 11.2689 143.783 12.1755 143.958 13.8078L144.116 15.3153V15.3178ZM135.394 4.79325V10.0899H139.769C141.555 10.0899 142.751 9.24448 142.751 7.44158C142.751 5.63868 141.553 4.79325 139.769 4.79325H135.394Z" fill="#0B0B0B"></path>
+          <path d="M145.688 3.35449H157.696V4.80089H152.595V17.5307H150.791V4.80344H145.69V3.35704L145.688 3.35449Z" fill="#0B0B0B"></path>
+          <path d="M164.194 3.13062C167.45 3.13062 169.493 4.68651 169.708 7.20497V7.50036H167.99C167.874 5.38424 166.272 4.52608 164.222 4.52608C162.171 4.52608 160.74 5.40207 160.74 6.96815C160.74 8.53423 162.017 9.04607 163.889 9.4204L165.587 9.75399C168.137 10.2658 170.003 11.1622 170.003 13.6526C170.003 16.1431 167.99 17.7576 164.608 17.7576C161.225 17.7576 158.928 16.1813 158.672 13.6323V13.3369H160.408C160.672 15.4937 162.438 16.3595 164.597 16.3595C166.757 16.3595 168.226 15.4937 168.226 13.7596C168.226 12.0254 166.813 11.6129 164.91 11.2309L163.212 10.8974C160.73 10.4059 158.964 9.34146 158.964 7.01908C158.964 4.6967 160.925 3.13062 164.194 3.13062Z" fill="#0B0B0B"></path>
+          <path d="M17.1954 14.7883L8.97328 0.5H0L11.5008 20.5H17.1929V14.7883H17.1954Z" fill="#0B0B0B"></path>
+          <path d="M29.0001 14.7883L20.7805 0.5H11.8047L23.3055 20.5H29.0001V14.7883Z" fill="#0B0B0B"></path>
+          <path class="logo-vector" d="M31.743 3.82569L28.8983 3.84097V10.3981L34.5903 0.5H23.2012" fill="#D0F200"></path>
+        </g>
+        <defs>
+          <clipPath id="clip0_1002_16158">
+            <rect width="170" height="20" fill="white" transform="translate(0 0.5)"></rect>
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+    <div class="brand-copy">
+      <h1>WSC ScoutBoard</h1>
+    </div>
+  </div>
 </div>
 
 <div class="tabs">
@@ -497,29 +577,59 @@ _TEMPLATE = r"""<!DOCTYPE html>
 <div class="page active" id="overview">
   <h2>The talent pool at a glance</h2>
   <p class="sub">Every conference attendee captured, enriched, and ready to match the moment a role opens.</p>
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="hero-badge">WSC Sports talent cockpit</div>
+        <div class="hero-kicker">ScoutBoard</div>
+        <div class="hero-title">Conference leads, internal movers, and referral paths in one operating view.</div>
+        <div class="hero-copy">Every person we meet at an industry conference is captured, enriched, and kept in a living talent pool - so the moment a role opens, the shortlist is already here: ranked on fit, with the warm-intro path to reach them.</div>
+      </div>
+      <div class="hero-tags">
+        <span class="hero-tag">WSC Sports</span>
+        <span class="hero-tag">ScoutBoard</span>
+        <span class="hero-tag">Live talent pool</span>
+        <span class="hero-tag">Conference to shortlist</span>
+      </div>
+    </div>
+  </div>
   <div class="kpis" id="ov-kpis"></div>
   <div class="banner" id="ov-banner"></div>
   <div class="charts" id="ov-charts"></div>
   <div class="card">
-    <div class="seclbl">How a lead becomes a shortlisted candidate</div>
+    <div class="seclbl">How the talent pool works — what's stored, and who's kept</div>
     <p style="font-size:13px;color:#334155;line-height:1.7;">
       Conference (badge scan) → captured in HubSpot → enriched with LinkedIn (skills, tenure,
       mutual connections, recommendations) → filtered for domain signal-vs-noise → scored against
       the open role → surfaced here with a warm-intro path. The pool is a living bank: it grows
       after each event and refreshes as profiles change.
     </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px;">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;">
+        <div style="font-weight:700;color:#0f3460;font-size:12.5px;margin-bottom:4px;">One pool, kept for everyone</div>
+        <div style="font-size:12px;color:#475569;line-height:1.6;">Every attendee is stored once in the pool — conference leads and internal movers alike. Nobody is deleted; off-domain people are simply <em>gated as noise</em> for a given role, not thrown away.</div>
+      </div>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 14px;">
+        <div style="font-weight:700;color:#7c2d12;font-size:12.5px;margin-bottom:4px;">◐ No LinkedIn? Still kept</div>
+        <div style="font-size:12px;color:#7c2d12;line-height:1.6;">Leads we couldn't match to a LinkedIn profile stay in the pool and are <strong>scored on conference data + recruiter notes alone</strong>, flagged <strong>No LinkedIn</strong>. Real leads are never silently dropped — see the “No LinkedIn” filter on the Match tab.</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;">
+        <div style="font-weight:700;color:#0f3460;font-size:12.5px;margin-bottom:4px;">Relevance is role-specific</div>
+        <div style="font-size:12px;color:#475569;line-height:1.6;">The same person is scored <strong>once per open role</strong>. So a candidate can be a strong fit for a Product role and a weak (or gated) fit for an ML role — near-adjacent roles are separated by per-role skill + domain matching, not one fixed label.</div>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- CONFERENCES -->
 <div class="page" id="conferences">
   <h2>Conferences &amp; talent domains</h2>
-  <p class="sub">Where we met the talent, grouped by the domain each attendee really works in.
+  <p class="sub">Where we met the talent, grouped by the domain each attendee really works in, newest conferences first.
      Expand a department, then click any attendee to shortlist their conference. The big
      <em>Other / Noise</em> bucket is exactly the signal-vs-noise problem this tool solves.</p>
   <div class="kpis" id="cf-kpis"></div>
   <div class="charts" id="cf-charts"></div>
-  <h4 style="font-size:14px;color:#0f3460;margin:6px 0 10px;">Attendees by department → conference</h4>
+  <h4 style="font-size:14px;color:#111827;margin:6px 0 10px;">Attendees by department → conference</h4>
   <div class="tree" id="cf-tree"></div>
 </div>
 
@@ -546,11 +656,12 @@ _TEMPLATE = r"""<!DOCTYPE html>
   <div class="controls">
     <div class="row">
       <select id="job-select"></select>
-      <input type="text" id="search" placeholder="Search the pool — name, skill, company, location…"/>
+      <input type="text" id="search" placeholder="Search the pool - name, skill, company, location…"/>
       <button class="reset" id="reset-weights">Reset weights</button>
+      <button class="toggle on" id="penalty-toggle">Penalty mode: On</button>
     </div>
     <div class="sliders" id="sliders"></div>
-    <div style="font-size:11px;color:#94a3b8;margin-top:10px;">
+    <div style="font-size:11px;color:#6b7280;margin-top:10px;">
       Weights are normalized automatically. Off-domain candidates (relevance &lt; 25%) are always gated out as noise.
     </div>
   </div>
@@ -560,6 +671,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
     <div class="sh-body" id="sh-body"></div>
   </details>
 
+  <div class="activefilter" id="mt-activefilter" style="display:none;"></div>
   <div class="charts" id="mt-charts"></div>
   <div class="kpis" id="mt-kpis"></div>
 
@@ -581,7 +693,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
 </div>
 
 <script>
-const DATA = /*__DATA__*/;
+const DATA = /*DATA_PLACEHOLDER*/;
 
 const TIER_COLOR = { "Strong Match":"#16a34a","Potential":"#f59e0b","Low":"#94a3b8","Weak":"#cbd5e1","Noise (off-domain)":"#ef4444" };
 const REL_COLOR = { recommendation:"#7c3aed", worked_together:"#0f766e", mutual_same_dept:"#16a34a", same_org:"#6366f1", mutual:"#94a3b8" };
@@ -596,6 +708,15 @@ const FLAG_STYLE = {
 };
 const SUB_LABELS = { skill_match:"Skills", domain_relevance:"Domain", seniority_fit:"Seniority", referral_strength:"Referral", stability:"Stability" };
 const DEPT_COLOR = { "AI/ML":"#7c3aed", "Data":"#0891b2", "Engineering":"#0f766e", "Product":"#d97706", "Other / Noise":"#94a3b8" };
+const PENALTY_RULES = {
+  JOB_HOPPER: { metric: "stability", label: "Stability", amount: 0.35, note: "Frequent job changes lower the stability signal." },
+  RECENTLY_STARTED: { metric: "stability", label: "Stability", amount: 0.20, note: "A very recent move lowers the stability signal." },
+  PARTIAL_SKILLS: { metric: "skill_match", label: "Skills", amount: row => Math.min(0.10 * Math.max((row.missing || []).length, 1), 0.30), note: "Missing required skills lower the skills signal." },
+  MISSING_LINKEDIN: { metric: "referral_strength", label: "Referral", amount: 0.20, note: "Without LinkedIn, referral coverage is weaker." },
+  NO_MUTUAL_CONNECTION: { metric: "referral_strength", label: "Referral", amount: 0.10, note: "No warm intro lowers the referral signal." },
+  PREVIOUSLY_REJECTED: { metric: "screening_caution", label: "Screening caution", amount: 0.12, note: "Previously rejected candidates get an extra screening caution deduction." },
+  ALREADY_APPLIED: { metric: "screening_caution", label: "Screening caution", amount: 0.06, note: "Already-applied candidates get a smaller screening caution deduction." },
+};
 // Flags that represent a drag on the score (surfaced explicitly so nothing hides).
 const PENALTY_FLAGS = ["JOB_HOPPER","RECENTLY_STARTED","PARTIAL_SKILLS","MISSING_LINKEDIN","NO_MUTUAL_CONNECTION","PREVIOUSLY_REJECTED","OFF_DOMAIN"];
 const META = DATA.scoring_meta;
@@ -606,6 +727,9 @@ let kpiFilter = null;      // tier filter from KPI card
 let searchTerm = "";
 let sortKey = "score", sortDir = -1;
 let confFilter = null;
+let deptFilter = null;
+let penaltyMode = true;
+let scoreBinFilter = null;
 
 const $ = s => document.querySelector(s);
 const esc = s => (s==null?"":(""+s)).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -618,7 +742,7 @@ function barChart(title, rows, help_){
   // rows: [{label, n, color}]. Scales bars to the largest value.
   const max = Math.max(1, ...rows.map(r=>r.n));
   const body = rows.map(r=>
-    '<div class="barrow"><span class="bl">'+esc(r.label)+'</span>'
+    '<div class="barrow'+(r.action?' clickable':'')+'"'+(r.action?' data-action="'+esc(r.action)+'" data-value="'+esc(r.value||r.label)+'"':'')+'><span class="bl">'+esc(r.label)+'</span>'
     +'<span class="bt"><div style="width:'+Math.round(r.n/max*100)+'%;background:'+(r.color||"#0f3460")+'"></div></span>'
     +'<span class="bn">'+r.n+'</span></div>').join("");
   return '<div class="chart"><h4>'+esc(title)+(help_?help(help_,true):"")+'</h4><div class="bars">'+body+'</div></div>';
@@ -627,7 +751,7 @@ function histChart(title, buckets, help_){
   // buckets: [{label, n}]. Vertical bars.
   const max = Math.max(1, ...buckets.map(b=>b.n));
   const body = buckets.map(b=>
-    '<div class="hb"><div class="hbar" style="height:'+Math.round(b.n/max*100)+'%" title="'+b.n+'"></div>'
+    '<div class="hb'+(b.action?' clickable':'')+'"'+(b.action?' data-action="'+esc(b.action)+'" data-value="'+esc(b.value||b.label)+'"':'')+'><div class="hbar" style="height:'+Math.round(b.n/max*100)+'%" title="'+b.n+'"></div>'
     +'<div class="hlbl">'+esc(b.label)+'</div></div>').join("");
   return '<div class="chart"><h4>'+esc(title)+(help_?help(help_,true):"")+'</h4><div class="hist">'+body+'</div></div>';
 }
@@ -648,26 +772,171 @@ function tierFor(score, domain){
   if (score >= 30) return "Low";
   return "Weak";
 }
+function penaltyRows(row){
+  if (!penaltyMode) return [];
+  const wsum = Object.values(weights).reduce((a,b)=>a+b,0) || 1;
+  return Object.entries(PENALTY_RULES).flatMap(([flag, rule])=>{
+    if (!row.flags.includes(flag)) return [];
+    const amount = typeof rule.amount === "function" ? rule.amount(row) : rule.amount;
+    if (!amount) return [];
+    const metricWeightPct = rule.metric in weights ? Math.round((weights[rule.metric] / wsum) * 100) : null;
+    const weighted = rule.metric in weights ? (weights[rule.metric] / wsum) * amount * 100 : amount * 100;
+    return [{ flag, metric: rule.label, amount, metricWeightPct, points: Math.round(weighted * 10) / 10, note: rule.note }];
+  });
+}
 function scoreRow(row){
   const wsum = Object.values(weights).reduce((a,b)=>a+b,0) || 1;
   let s = 0;
   for (const k in weights){ s += (weights[k]/wsum) * (row.subs[k]||0); }
-  const score = Math.round(s*1000)/10;
-  return { score, tier: tierFor(score, row.domain_relevance) };
+  const baseScore = Math.round(s*1000)/10;
+  const penalties = penaltyRows(row);
+  const penaltyPoints = penalties.reduce((sum, p)=>sum + p.points, 0);
+  const score = Math.max(0, Math.round((baseScore - penaltyPoints) * 10) / 10);
+  return { score, baseScore, penaltyPoints: Math.round(penaltyPoints * 10) / 10, penalties, tier: tierFor(score, row.domain_relevance) };
 }
 function computed(jobId){
   return DATA.candidates_by_job[jobId].map(r=>{
-    const {score,tier} = scoreRow(r);
-    return Object.assign({}, r, {score, tier});
+    const {score, baseScore, penaltyPoints, penalties, tier} = scoreRow(r);
+    return Object.assign({}, r, {score, baseScore, penaltyPoints, penalties, tier});
   });
 }
 
-// ---- tabs ----
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+function fmtDate(iso){
+  if (!iso) return "—";
+  const d = new Date(iso + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return iso;
+  return new Intl.DateTimeFormat("en-US", { month:"short", day:"numeric", year:"numeric" }).format(d);
+}
+
+function activateTab(page, after){
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-  t.classList.add("active"); $("#"+t.dataset.page).classList.add("active");
+  const tab = document.querySelector('.tab[data-page="'+page+'"]');
+  if (tab) tab.classList.add("active");
+  const pageEl = document.getElementById(page);
+  if (pageEl) pageEl.classList.add("active");
+  if (after) setTimeout(after, 0);
+}
+
+function handlePanelAction(action, value){
+  if (!action) return;
+  if (action === "match-all") {
+    confFilter = null; deptFilter = null; kpiFilter = null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "filter-conference") {
+    confFilter = value || null; deptFilter = null; kpiFilter = null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "filter-department") {
+    deptFilter = value || null; confFilter = null; kpiFilter = null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "filter-job") {
+    if (value) currentJob = value;
+    confFilter = null; deptFilter = null; kpiFilter = null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "filter-kpi") {
+    confFilter = null; deptFilter = null; kpiFilter = value || null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "filter-score-bin") {
+    scoreBinFilter = (scoreBinFilter === value) ? null : value;
+    confFilter = null; deptFilter = null; kpiFilter = null; searchTerm = "";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "conferences") {
+    activateTab("conferences", ()=>document.getElementById("cf-tree").scrollIntoView({behavior:"smooth", block:"start"}));
+    return;
+  }
+  if (action === "jobs") {
+    activateTab("jobs", ()=>document.getElementById("jobs-table").scrollIntoView({behavior:"smooth", block:"start"}));
+    return;
+  }
+  if (action === "match") {
+    confFilter = null; kpiFilter = null;
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "match-intro") {
+    confFilter = null; kpiFilter = "intro";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+    return;
+  }
+  if (action === "match-internal") {
+    confFilter = null; deptFilter = null; kpiFilter = "internal";
+    activateTab("match", ()=>document.getElementById("mt-kpis").scrollIntoView({behavior:"smooth", block:"start"}));
+    renderMatch();
+  }
+}
+
+document.addEventListener("click", e=>{
+  const actionCard = e.target.closest && e.target.closest("[data-action]");
+  if (actionCard) {
+    handlePanelAction(actionCard.dataset.action, actionCard.dataset.value);
+    return;
+  }
 });
+
+// ---- tabs ----
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  // A top-level tab click is a fresh view - drop any drill-down filters so
+  // one page's filter never leaks into another.
+  resetFiltersSilent();
+  activateTab(t.dataset.page);
+  if (t.dataset.page==="match") renderMatch();
+});
+
+// ---- filter state helpers (single active drill-down at a time) ----
+function resetFiltersSilent(){
+  confFilter=null; deptFilter=null; kpiFilter=null; scoreBinFilter=null; searchTerm="";
+  const s=document.getElementById("search"); if (s) s.value="";
+}
+function clearFilters(){ resetFiltersSilent(); renderMatch(); }
+function clearOneFilter(which){
+  if (which==="conf") confFilter=null;
+  else if (which==="dept") deptFilter=null;
+  else if (which==="kpi") kpiFilter=null;
+  else if (which==="bin") scoreBinFilter=null;
+  else if (which==="search"){ searchTerm=""; const s=document.getElementById("search"); if (s) s.value=""; }
+  renderMatch();
+}
+function kpiFilterLabel(f){
+  const m={relevant:"Relevant",intro:"Warm intro",noise:"Noise",recommended:"Recommended",internal:"Internal",nolinkedin:"No LinkedIn","Strong Match":"Strong","Potential":"Potential","Low":"Low","Weak":"Weak"};
+  return m[f]||f;
+}
+function renderActiveFilter(){
+  const box=document.getElementById("mt-activefilter");
+  if (!box) return;
+  const chips=[];
+  if (confFilter) chips.push(["Conference: "+confFilter,"conf"]);
+  if (deptFilter) chips.push(["Department: "+deptFilter,"dept"]);
+  if (kpiFilter) chips.push([kpiFilterLabel(kpiFilter),"kpi"]);
+  if (scoreBinFilter) chips.push(["Score "+scoreBinFilter,"bin"]);
+  if (searchTerm) chips.push(['Search: "'+searchTerm+'"',"search"]);
+  if (!chips.length){ box.style.display="none"; box.innerHTML=""; return; }
+  box.style.display="flex";
+  box.innerHTML='<span class="af-label">Filtering this shortlist by:</span>'
+    + chips.map(c=>'<span class="af-chip" data-clear="'+c[1]+'">'+esc(c[0])+' <span class="af-x">\u00d7</span></span>').join("")
+    + '<button class="af-clear" id="af-clear-all">Clear all</button>';
+  box.querySelectorAll(".af-chip").forEach(ch=>ch.onclick=()=>clearOneFilter(ch.dataset.clear));
+  document.getElementById("af-clear-all").onclick=()=>clearFilters();
+}
 
 // ---- overview ----
 function renderOverview(){
@@ -678,27 +947,40 @@ function renderOverview(){
   let strong=0, withIntro=0;
   DATA.jobs.forEach(j=>{ computed(j.job_id).forEach(r=>{ if(r.tier==="Strong Match") strong++; }); });
   const el = $("#ov-kpis");
-  el.innerHTML = kpi(totalPool,"Candidates in pool",true)
-    + kpi(conf,"Conferences captured",true)
-    + kpi(DATA.jobs.length,"Open roles",true)
-    + kpi(DATA.employees.length,"Employees (referrers)",true);
+  el.innerHTML = kpi(totalPool,"Candidates in pool",false,false,"match-all","Open the ranked shortlist")
+    + kpi(conf,"Conferences captured",false,false,"conferences","Browse the conference list")
+    + kpi(DATA.jobs.length,"Open roles",false,false,"jobs","See the open-job queue")
+    + kpi(DATA.employees.length,"Employees (referrers)",false,false,"match-intro","Jump to warm intro paths");
   const topJob = DATA.jobs.map(j=>({j, n:computed(j.job_id).filter(r=>r.tier==="Strong Match").length}))
                           .sort((a,b)=>b.n-a.n)[0];
   $("#ov-banner").innerHTML = "🔔 <strong>"+topJob.n+" strong matches</strong> already sitting in the pool for <strong>"
-     + esc(topJob.j.title) + "</strong> — no new sourcing required. Open the Match tab to act.";
+    + esc(topJob.j.title) + "</strong> - no new sourcing required. Open the Match tab to act.";
 
   const deptCounts = {};
   DATA.attendees.forEach(a=>{ deptCounts[a.department]=(deptCounts[a.department]||0)+1; });
   const deptRows = Object.keys(deptCounts).sort((a,b)=>deptCounts[b]-deptCounts[a])
-     .map(d=>({label:d, n:deptCounts[d], color:DEPT_COLOR[d]||"#0f3460"}));
-  const jobRows = DATA.jobs.map(j=>({label:j.title, n:computed(j.job_id).filter(r=>r.tier==="Strong Match").length, color:"#16a34a"}));
+    .map(d=>({label:d, n:deptCounts[d], color:DEPT_COLOR[d]||"#0f3460", action:"filter-department", value:d}));
+  const jobRows = DATA.jobs.map(j=>({label:j.title, n:computed(j.job_id).filter(r=>r.tier==="Strong Match").length, color:"#16a34a", action:"filter-job", value:j.job_id}));
   $("#ov-charts").innerHTML =
     barChart("Talent pool by department", deptRows, "Each conference attendee is classified into the domain they actually work in, from their title and skills. The Other / Noise bucket is people who attended but aren't in a hiring domain — the signal-vs-noise problem.")
     + barChart("Strong matches waiting, by open role", jobRows, "How many Strong-tier candidates already sit in the pool for each open role — talent you can act on without new sourcing.");
 }
-function kpi(n,l,isStatic,active){
-  return '<div class="kpi'+(isStatic?' static':'')+(active?' active':'')+'" '
+function kpi(n,l,isStatic,active,action,title){
+  return '<div class="kpi'+(isStatic?' static':'')+(active?' active':'')+(action?' clickable':'')+'" '
+    +(action?'data-action="'+esc(action)+'" ':'')
+    +(title?'title="'+esc(title)+'" ':'')
     +(l?'data-l="'+esc(l)+'"':'')+'><div class="n">'+n+'</div><div class="l">'+esc(l)+'</div></div>';
+}
+
+function conferenceCards(conferences){
+  const cards = conferences.map(c=>
+    '<div class="conf-card clickable" data-action="filter-conference" data-value="'+esc(c.name)+'">'
+      +'<div class="conf-top"><span class="conf-date">'+esc(fmtDate(c.date))+'</span><span class="conf-count">'+c.attendees+' attendees</span></div>'
+      +'<div class="conf-name">'+esc(c.name)+'</div>'
+      +'<div class="conf-domain">'+esc(c.domain)+'</div>'
+    +'</div>'
+  ).join("");
+  return '<div class="chart"><h4>Conferences at a glance</h4><div class="conf-grid">'+cards+'</div></div>';
 }
 
 // ---- conferences (department tree + charts) ----
@@ -708,22 +990,22 @@ function renderConferences(){
   const total = att.length;
   const domains = new Set(att.map(a=>a.department!=="Other / Noise"?a.department:null).filter(Boolean));
   const noise = att.filter(a=>a.department==="Other / Noise").length;
-  $("#cf-kpis").innerHTML = kpi(DATA.conferences.length,"Conferences",true)
-    + kpi(total,"Attendees captured",true)
-    + kpi(domains.size,"Real domains",true)
-    + kpi(noise,"Off-domain (noise)",true);
+  $("#cf-kpis").innerHTML = kpi(DATA.conferences.length,"Conferences",false,false,"conferences","Open the conference list")
+    + kpi(total,"Attendees captured",false,false,"conferences","Open the attendees tree")
+    + kpi(domains.size,"Real domains",false,false,"conferences","Open the conference list")
+    + kpi(noise,"Off-domain (noise)",false,false,"conferences","Open the conference list");
 
-  // charts: attendees per conference + attendees per department
-  const byConf = DATA.conferences.map(c=>({label:c.name, n:c.attendees, color:"#0f3460"}));
+  // charts: conference cards + attendees by department
   const deptCounts = {};
   att.forEach(a=>{ deptCounts[a.department]=(deptCounts[a.department]||0)+1; });
-  const deptRows = DEPT_ORDER.filter(d=>deptCounts[d]).map(d=>({label:d, n:deptCounts[d], color:DEPT_COLOR[d]}));
+  const deptRows = DEPT_ORDER.filter(d=>deptCounts[d]).map(d=>({label:d, n:deptCounts[d], color:DEPT_COLOR[d], action:"filter-department", value:d}));
   $("#cf-charts").innerHTML =
-    barChart("Attendees per conference", byConf)
+    conferenceCards(DATA.conferences)
     + barChart("Attendees by department", deptRows, "The split between real hiring domains and the Other / Noise crowd that any conference attracts.");
 
   // tree: department -> conference -> attendees
   const grouped = {};
+  const confMeta = Object.fromEntries(DATA.conferences.map(c=>[c.name, c]));
   att.forEach(a=>{
     (grouped[a.department] = grouped[a.department] || {});
     (grouped[a.department][a.conference] = grouped[a.department][a.conference] || []).push(a);
@@ -739,7 +1021,8 @@ function renderConferences(){
         +'<td>'+esc(a.title||"—")+'</td><td>'+esc(a.company||"—")+'</td>'
         +'<td>'+(a.years!=null?a.years+" yrs":"—")+'</td>'
         +'<td>'+(a.has_linkedin?'<span class="chip chip-ok">LinkedIn</span>':'<span class="chip chip-miss">No LinkedIn</span>')+'</td></tr>').join("");
-      return '<div class="tconf">'+esc(cf)+' <span class="muted">('+confs[cf].length+')</span></div>'
+      const meta = confMeta[cf] || {};
+      return '<div class="tconf">'+esc(cf)+' <span class="muted">('+fmtDate(meta.date)+', '+confs[cf].length+')</span></div>'
         +'<table class="mini-table"><thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Exp</th><th>Profile</th></tr></thead><tbody>'+rows+'</tbody></table>';
     }).join("");
     return '<div class="tnode"><div class="tdept" data-d="'+esc(d)+'">'
@@ -754,7 +1037,7 @@ function renderConferences(){
   });
   $("#cf-tree").querySelectorAll("tr.clickable").forEach(tr=>tr.onclick=(e)=>{
     e.stopPropagation();
-    confFilter = tr.dataset.conf; searchTerm=""; kpiFilter=null;
+    confFilter = tr.dataset.conf; deptFilter=null; searchTerm=""; kpiFilter=null;
     document.querySelector('.tab[data-page="match"]').click(); renderMatch();
   });
 }
@@ -784,7 +1067,7 @@ function renderJobs(){
   }).join("");
   tb.querySelectorAll("tr").forEach(tr=>tr.onclick=()=>{
     currentJob = tr.dataset.job; $("#job-select").value = currentJob;
-    confFilter=null; kpiFilter=null;
+    confFilter=null; deptFilter=null; kpiFilter=null;
     document.querySelector('.tab[data-page="match"]').click(); renderMatch();
   });
 }
@@ -816,7 +1099,7 @@ function renderScoringHelp(){
       +' · Low '+META.tiers.low+'-'+(META.tiers.potential-1)+' · Weak &lt; '+META.tiers.low
       +' · <span style="color:#dc2626;">Noise</span> = domain relevance &lt; '+Math.round(DATA.noise_gate*100)+'% (gated out).</p>'
     +'<p style="margin-top:8px;"><strong>Seniority bands:</strong> '+bands+'.</p>'
-    +'<p style="margin-top:14px;font-weight:700;color:#0f3460;">Referral strength — quality beats quantity</p>'
+    +'<p style="margin-top:14px;font-weight:700;color:#111827;">Referral strength — quality beats quantity</p>'
     +'<table class="mini-table" style="max-width:340px;margin-top:6px;"><thead><tr><th>Relationship</th><th>Weight</th></tr></thead><tbody>'+rels+'</tbody></table>'
     +'<p style="margin-top:14px;font-weight:700;color:#dc2626;">Penalties (what drags a score down)</p>'
     +'<div class="wexp" style="margin-top:6px;">'+Object.keys(META.penalties).map(k=>
@@ -826,37 +1109,44 @@ function renderMatch(){
   $("#job-select").innerHTML = DATA.jobs.map(j=>
     '<option value="'+j.job_id+'">'+esc(j.title)+' ('+j.job_id+')</option>').join("");
   $("#job-select").value = currentJob;
+  $("#penalty-toggle").textContent = penaltyMode ? "Penalty mode: On" : "Penalty mode: Off";
+  $("#penalty-toggle").classList.toggle("on", penaltyMode);
   renderMatchKpis(); renderMatchTable();
   renderMatchCharts();
   if (confFilter){
-    $("#search").placeholder = "Filtered to: "+confFilter+" — type to search…";
+    $("#search").placeholder = "Filtered to: "+confFilter+" - type to search…";
+  } else if (deptFilter){
+    $("#search").placeholder = "Filtered to: "+deptFilter+" - type to search…";
   }
 }
 function renderMatchCharts(){
-  const all = computed(currentJob).filter(r=>!confFilter||r.conference===confFilter);
+  const all = computed(currentJob).filter(r=>!confFilter||r.conference===confFilter).filter(r=>!deptFilter||r.department===deptFilter);
   const tiers = ["Strong Match","Potential","Low","Weak","Noise (off-domain)"];
-  const tierRows = tiers.map(t=>({label:t.replace(" (off-domain)",""), n:all.filter(r=>r.tier===t).length, color:TIER_COLOR[t]}));
+  const tierRows = tiers.map(t=>({label:t.replace(" (off-domain)",""), n:all.filter(r=>r.tier===t).length, color:TIER_COLOR[t], action:"filter-kpi", value:(t==="Strong Match"?"Strong Match":t==="Potential"?"relevant":t==="Noise (off-domain)"?"noise":t)}));
   const refRows = [
-    {label:"Recommendation", n:all.filter(r=>r.referrals.some(x=>x.relation==="recommendation")).length, color:"#7c3aed"},
-    {label:"Worked together", n:all.filter(r=>r.referrals.some(x=>x.relation==="worked_together")).length, color:"#0f766e"},
-    {label:"Mutual (same team)", n:all.filter(r=>r.referrals.some(x=>x.relation==="mutual_same_dept")).length, color:"#16a34a"},
-    {label:"Any mutual", n:all.filter(r=>r.referrals.length>0).length, color:"#94a3b8"},
-    {label:"No warm intro", n:all.filter(r=>r.referrals.length===0 && !r.is_internal).length, color:"#cbd5e1"},
+    {label:"Recommendation", n:all.filter(r=>r.referrals.some(x=>x.relation==="recommendation")).length, color:"#7c3aed", action:"filter-kpi", value:"recommended"},
+    {label:"Worked together", n:all.filter(r=>r.referrals.some(x=>x.relation==="worked_together")).length, color:"#0f766e", action:"filter-kpi", value:"intro"},
+    {label:"Mutual (same team)", n:all.filter(r=>r.referrals.some(x=>x.relation==="mutual_same_dept")).length, color:"#16a34a", action:"filter-kpi", value:"intro"},
+    {label:"Any mutual", n:all.filter(r=>r.referrals.length>0).length, color:"#94a3b8", action:"filter-kpi", value:"intro"},
+    {label:"No warm intro", n:all.filter(r=>r.referrals.length===0 && !r.is_internal).length, color:"#cbd5e1", action:"filter-kpi", value:"noise"},
+    {label:"No LinkedIn profile", n:all.filter(r=>r.flags.includes("MISSING_LINKEDIN")).length, color:"#ef4444", action:"filter-kpi", value:"nolinkedin"},
   ];
   $("#mt-charts").innerHTML =
     barChart("Shortlist by tier", tierRows, "How the screened pool splits across match tiers for the current weights. Noise is gated out of the shortlist.")
-    + histChart("Score distribution", scoreHistogram(all), "Match-score spread across non-noise candidates. Re-tuning the sliders reshapes this live.")
+    + histChart("Score distribution", scoreHistogram(all).map(b=>Object.assign({}, b, {action:"filter-score-bin", value:b.label})), "Match-score spread across non-noise candidates. Click a bucket to filter the shortlist by score range.")
     + barChart("Warm-intro paths", refRows, "The strongest referral relationship available per candidate — how many arrive with a credible internal reference.");
 }
 function filteredRows(){
   let rows = computed(currentJob);
   if (confFilter) rows = rows.filter(r=>r.conference===confFilter);
+  if (deptFilter) rows = rows.filter(r=>r.department===deptFilter);
   if (kpiFilter){
     if (kpiFilter==="relevant") rows = rows.filter(r=>r.tier==="Strong Match"||r.tier==="Potential");
     else if (kpiFilter==="intro") rows = rows.filter(r=>r.referrals.length>0 && r.tier!=="Noise (off-domain)");
     else if (kpiFilter==="noise") rows = rows.filter(r=>r.tier==="Noise (off-domain)");
     else if (kpiFilter==="recommended") rows = rows.filter(r=>r.flags.includes("HAS_RECOMMENDATION"));
     else if (kpiFilter==="internal") rows = rows.filter(r=>r.is_internal);
+    else if (kpiFilter==="nolinkedin") rows = rows.filter(r=>r.flags.includes("MISSING_LINKEDIN"));
     else rows = rows.filter(r=>r.tier===kpiFilter);
   }
   if (searchTerm){
@@ -866,6 +1156,12 @@ function filteredRows(){
                    (r.referrals||[]).map(x=>x.name).join(" ")].join(" ").toLowerCase();
       return hay.includes(q);
     });
+  }
+  if (scoreBinFilter){
+    if (scoreBinFilter === "<30") rows = rows.filter(r=>r.tier!=="Noise (off-domain)" && r.score < 30);
+    else if (scoreBinFilter === "30-49") rows = rows.filter(r=>r.tier!=="Noise (off-domain)" && r.score >= 30 && r.score < 50);
+    else if (scoreBinFilter === "50-69") rows = rows.filter(r=>r.tier!=="Noise (off-domain)" && r.score >= 50 && r.score < 70);
+    else if (scoreBinFilter === "70+") rows = rows.filter(r=>r.tier!=="Noise (off-domain)" && r.score >= 70);
   }
   rows.sort((a,b)=>{
     let av,bv;
@@ -880,26 +1176,31 @@ function filteredRows(){
   return rows;
 }
 function renderMatchKpis(){
-  const all = computed(currentJob).filter(r=>!confFilter||r.conference===confFilter);
+  const all = computed(currentJob).filter(r=>!confFilter||r.conference===confFilter).filter(r=>!deptFilter||r.department===deptFilter);
   const relevant = all.filter(r=>r.tier==="Strong Match"||r.tier==="Potential").length;
   const strong = all.filter(r=>r.tier==="Strong Match").length;
   const intro = all.filter(r=>r.referrals.length>0 && r.tier!=="Noise (off-domain)").length;
   const noise = all.filter(r=>r.tier==="Noise (off-domain)").length;
   const rec = all.filter(r=>r.flags.includes("HAS_RECOMMENDATION")).length;
   const internal = all.filter(r=>r.is_internal).length;
+  const nolink = all.filter(r=>r.flags.includes("MISSING_LINKEDIN")).length;
   const cards = [
-    [all.length,"Screened",null],[relevant,"Relevant","relevant"],[strong,"Strong","Strong Match"],
+    [all.length,"Screened","match-all"],[relevant,"Relevant","relevant"],[strong,"Strong","Strong Match"],
     [intro,"Warm intro","intro"],[rec,"Recommended","recommended"],[internal,"Internal","internal"],
-    [noise,"Noise","noise"]
+    [nolink,"No LinkedIn","nolinkedin"],[noise,"Noise","noise"]
   ];
   $("#mt-kpis").innerHTML = cards.map(([n,l,f])=>
-    '<div class="kpi'+(kpiFilter===f?' active':'')+(f===null?' static':'')+'" data-f="'+(f||"")+'">'
+    '<div class="kpi'+(kpiFilter===f?' active':'')+(f===null?' static':'')+' clickable" data-f="'+(f||"")+'" title="Filter the shortlist">'
     +'<div class="n">'+n+'</div><div class="l">'+l+'</div></div>').join("");
   $("#mt-kpis").querySelectorAll(".kpi").forEach(c=>{
     if (c.classList.contains("static")) return;
     c.onclick=()=>{
       const f = c.dataset.f;
-      kpiFilter = (kpiFilter===f)?null:f; renderMatchKpis(); renderMatchTable();
+      // Selecting a KPI is a single active filter - clear any other drill-down first.
+      confFilter=null; deptFilter=null; scoreBinFilter=null;
+      if (f === "match-all") kpiFilter = null;
+      else kpiFilter = (kpiFilter===f)?null:f;
+      renderMatch();
     };
   });
 }
@@ -916,13 +1217,14 @@ function renderMatchTable(){
     const badge = r.is_internal ? '<span class="src-int">Internal</span> ' : '';
     return '<tr class="clickable" data-i="'+i+'"><td>'+(i+1)+'</td>'
       +'<td>'+badge+'<strong>'+esc(r.name)+'</strong><br><span class="muted" style="font-size:11px;">'+esc(r.title)+' · '+esc(r.company)+'</span></td>'
-      +'<td><strong style="font-size:15px;color:#0f3460;">'+r.score.toFixed(0)+'</strong></td>'
+      +'<td><strong style="font-size:15px;color:#111827;">'+r.score.toFixed(0)+'</strong></td>'
       +'<td><span class="pill" style="background:'+tc+'">'+esc(r.tier)+'</span></td>'
       +'<td style="font-size:12px;">'+introTxt+'</td>'
       +'<td><span class="barmini"><div style="width:'+Math.round(r.subs.skill_match*100)+'%"></div></span></td>'
       +'<td>'+flags+'</td></tr>';
   }).join("") || '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">No candidates match these filters.</td></tr>';
   tb.querySelectorAll("tr.clickable").forEach(tr=>tr.onclick=()=>openDrawer(rows[+tr.dataset.i]));
+  renderActiveFilter();
 }
 
 // ---- drawer ----
@@ -942,25 +1244,38 @@ function scoreMathHtml(r){
       +'<span class="mcalc">'+Math.round(nw*100)+'% × '+Math.round((r.subs[k]||0)*100)+'%</span>'
       +'<span class="mpts">'+pts.toFixed(1)+'</span></div>';
   }).join("");
-  return rows + '<div class="mathtot"><span>Match score</span><span>'+total.toFixed(1)+' / 100</span></div>';
+  const adjusted = penaltyMode ? Math.max(0, total - (r.penaltyPoints || 0)) : total;
+  const penaltyRowsHtml = penaltyMode && r.penalties.length ? '<div class="penbox" style="margin-top:12px;">'
+    +'<div class="penrow" style="padding-bottom:6px;"><strong>Penalty mode on</strong> - these deductions are applied to the score.</div>'
+    +r.penalties.map(p=>
+      '<div class="penrow">▼ <strong>'+p.metric+'</strong> -'
+      +' <span class="pd">'+(p.metricWeightPct!=null ? p.metricWeightPct+'% × ' : '')+Math.round(p.amount*100)+'% = -'+p.points.toFixed(1)+' pts</span>'
+      +' <span class="muted">'+esc(p.note)+'</span></div>').join("")
+    +'</div>' : (!penaltyMode ? '<div class="note-info" style="margin-top:12px;">Penalty mode is off. The score below uses only the five base signals.</div>' : '<div class="note-info" style="margin-top:12px;">No penalty flags fired for this candidate.</div>');
+  return rows
+    + '<div class="mathtot"><span>Base score</span><span>'+total.toFixed(1)+' / 100</span></div>'
+    + '<div class="mathtot"><span>After penalties</span><span>'+adjusted.toFixed(1)+' / 100</span></div>'
+    + penaltyRowsHtml;
 }
 function signalsHtml(r){
   const boostsMap = {
-    HAS_RECOMMENDATION:"Public LinkedIn recommendation — the strongest referral signal.",
+    HAS_RECOMMENDATION:"Public LinkedIn recommendation from a WSC employee — the strongest referral signal.",
     WORKED_WITH_EMPLOYEE:"A current WSC employee worked with them — a first-hand reference.",
     STRONG_REFERRAL:"Same-department warm intro — a credible domain peer can vouch.",
     MOVABLE_SWEET_SPOT:"~2-4 yrs into their role — the sweet spot to be open to a move.",
     INTERNAL_MOBILITY:"Existing employee — fastest, cheapest, lowest-risk hire."
   };
   const boosts = r.flags.filter(f=>boostsMap[f]);
-  const pens = r.flags.filter(f=>PENALTY_FLAGS.includes(f));
+  const pens = r.penalties || [];
   let html='';
+  if (r.flags.includes("MISSING_LINKEDIN"))
+    html += '<div class="inforow">\u25d0 <strong>No LinkedIn profile on file.</strong> This lead never shared a profile, so there is nothing to enrich from. Rather than drop a real lead, they are <strong>kept in the pool and scored on the signals we do have</strong> - conference domain, title and role-fit - with referral coverage counted as unknown, not zero merit.</div>';
   if (boosts.length)
     html += boosts.map(f=>'<div class="goodrow">▲ <strong>'+(FLAG_STYLE[f]?FLAG_STYLE[f][1]:f)+'</strong> — '+esc(boostsMap[f])+'</div>').join("");
   if (pens.length)
-    html += '<div class="penbox">'+pens.map(f=>
-      '<div class="penrow">▼ <strong>'+(FLAG_STYLE[f]?FLAG_STYLE[f][1]:f)+'</strong> — <span class="pd">'+esc(META.penalties[f]||"")+'</span></div>').join("")+'</div>';
-  if (!html) html='<span class="muted">No penalties flagged — a clean profile for this role.</span>';
+    html += '<div class="penbox">'+pens.map(p=>
+      '<div class="penrow">▼ <strong>'+p.metric+'</strong> — <span class="pd">-'+p.points.toFixed(1)+' pts</span> <span class="muted">'+esc(p.note)+'</span></div>').join("")+'</div>';
+  if (!html) html='<span class="muted">No penalty flags fired — a clean profile for this role.</span>';
   return html;
 }
 function openDrawer(r){
@@ -968,9 +1283,7 @@ function openDrawer(r){
   $("#d-sub").textContent = r.title+" · "+r.company+" · "+(r.location||"—")+" · "+(r.years!=null?r.years+" yrs":"exp n/a");
   const refs = r.referrals.length ? r.referrals.map(ref=>{
     const rc = REL_COLOR[ref.relation]||"#94a3b8";
-    const who = ref.is_external
-      ? '<strong>'+esc(ref.name)+'</strong> '+esc(ref.title)+' <span class="muted">— external, connected to '+esc(ref.bridge)+' @ WSC</span>'
-      : '<strong>'+esc(ref.name)+'</strong> — '+esc(ref.title)+' <span class="muted">('+esc(ref.dept)+')</span>'+(ref.org?' <span class="muted">@ '+esc(ref.org)+'</span>':'');
+    const who = '<strong>'+esc(ref.name)+'</strong> — '+esc(ref.title)+' <span class="muted">('+esc(ref.dept)+')</span>'+(ref.org?' <span class="muted">@ '+esc(ref.org)+'</span>':'');
     return '<div class="refbox">'+who+'<span class="rel" style="background:'+rc+'">'+esc(ref.relation_label)+'</span>'
       +(ref.note?'<div class="note">“'+esc(ref.note)+'”</div>':'')+'</div>';
   }).join("") : '<span class="muted">No mutual connections or recommendations found.</span>';
@@ -1012,9 +1325,10 @@ $("#drawer-close").onclick = $("#drawer-bg").onclick = ()=>{
 };
 
 // ---- wiring ----
-$("#job-select").onchange = e=>{ currentJob=e.target.value; confFilter=null; kpiFilter=null; renderMatch(); };
+$("#job-select").onchange = e=>{ currentJob=e.target.value; resetFiltersSilent(); renderMatch(); };
 $("#search").oninput = e=>{ searchTerm=e.target.value; renderMatchTable(); };
 $("#reset-weights").onclick = ()=>{ weights=Object.assign({},DATA.weights); buildSliders(); renderMatchTable(); renderMatchKpis(); renderMatchCharts(); };
+$("#penalty-toggle").onclick = ()=>{ penaltyMode = !penaltyMode; renderMatchTable(); renderMatchKpis(); renderMatchCharts(); renderMatch(); };
 document.querySelectorAll("#mt-table th[data-sort]").forEach(th=>th.onclick=()=>{
   const k=th.dataset.sort; if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir=-1;} renderMatchTable();
 });
